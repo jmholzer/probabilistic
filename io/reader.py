@@ -7,10 +7,10 @@ class AbstractReader(ABC):
     and return the cleaned, transformed result as a DataFrame
 
     Methods:
-        __init__
         read
         _ingest_data
-        _clean_column_names
+        _clean_data
+        _transform_data
     """
 
     @abstractmethod
