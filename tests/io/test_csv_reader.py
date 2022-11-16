@@ -7,10 +7,7 @@ from probabilistic.io import CSVReader
 
 @pytest.fixture
 def sample_url():
-    sample_url_path = (
-        Path(__file__).parent.resolve()
-        / Path("resources/sample.csv")
-    )
+    sample_url_path = Path(__file__).parent.resolve() / Path("resources/sample.csv")
     return str(sample_url_path)
 
 
