@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "probabilistic"
+version = "0.0.0"
+authors = [
+  { name="Jannic Holzer", email="jannic.holzer@gmail.com" },
+]
+description = "Generate future price PDFs for publicly traded securities using options data"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+]
+dynamic = ["dependencies"]
+
+[project.urls]
+"Homepage" = "https://github.com/jmholzer/probabilistic-pdfs"
+"Bug Tracker" = "https://github.com/jmholzer/probabilistic-pdfs/issues"
+
+[tools.setup.dynamic]
+dependencies = {file = ["requirements.txt"]}
