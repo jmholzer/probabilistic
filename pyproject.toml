@@ -21,5 +21,8 @@ dynamic = ["dependencies"]
 "Homepage" = "https://github.com/jmholzer/probabilistic-pdfs"
 "Bug Tracker" = "https://github.com/jmholzer/probabilistic-pdfs/issues"
 
+[project.scripts]
+probabilistic = "probabilistic.cli:main"
+
 [tools.setup.dynamic]
 dependencies = {file = ["requirements.txt"]}
