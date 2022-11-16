@@ -24,5 +24,8 @@ dynamic = ["dependencies"]
 [project.scripts]
 probabilistic = "probabilistic.cli:main"
 
-[tools.setup.dynamic]
+[tool.setuptools]
+packages = ["probabilistic"]
+
+[tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
