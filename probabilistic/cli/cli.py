@@ -1,6 +1,6 @@
 import click
 
-import csv_runner
+from . import csv_runner
 
 
 @click.group(name="probabilistic")
@@ -13,6 +13,14 @@ def cli():
 @cli.command()
 @click.option("--csv", "input_csv_path")
 def calculate(input_csv_path: str) -> None:
+    """The CLI endpoint for running probabilistic end-to-end
+
+    Args:
+        input_csv_path:
+
+    Returns:
+        None
+    """
     if input_csv_path:
         csv_runner.run(input_csv_path)
 
