@@ -115,7 +115,7 @@ def calculate_mid_price(options_data: pd.DataFrame) -> pd.DataFrame:
 def calculate_IV(
     options_data: pd.DataFrame, current_price: float, days_forward: int
 ) -> pd.DataFrame:
-    """Calculate the options_data
+    """Calculate the implied volatility of the options in options_data
 
     Args:
         options_data: a DataFrame containing options price data with
@@ -125,7 +125,7 @@ def calculate_IV(
             price probability density at
 
     Returns:
-
+        the options_data DataFrame, with an additional column for implied volatility
     """
     years_forward = days_forward / 365
     options_data["iv"] = options_data.apply(
