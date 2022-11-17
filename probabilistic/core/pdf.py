@@ -1,16 +1,13 @@
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+from pandas import DataFrame
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
 from scipy.stats import norm
 
-
-from datetime import datetime
 from diff_tvr import DiffTVR
-
-from typing import Tuple
-
 
 # FORK: put IV values through a gaussian filter
 # there is no academic reason to do this
@@ -19,8 +16,6 @@ from typing import Tuple
 # if we were gonna do gaussian filtering, we'll need a way to tune the parameter automatically
 calls_clean["iv_gaussianfilter"] = gaussian_filter1d(calls_clean.iv, 3)
 
-plt.scatter(calls_clean["strike"], calls_clean["iv_gaussianfilter"])
-plt.show()
 
 # %%
 # FORK 2: using scipy's interp1d to interpolate continuous IV smile
@@ -77,7 +72,7 @@ diff_tvr = DiffTVR(n, 0.05)
 
 
 def calculate_pdf(
-    options_data: pd.DataFrame, current_price: float, days_forward: int
+    options_data: DataFrame, current_price: float, days_forward: int
 ) -> Tuple[np.array]:
     """The main execution path for the pdf module. Takes a `DataFrame` of
     options data as input and makes a series of function calls to
@@ -97,7 +92,7 @@ def calculate_pdf(
     options_data = calculate_IV(options_data, current_price, days_forward)
 
 
-def calculate_mid_price(options_data: pd.DataFrame) -> pd.DataFrame:
+def calculate_mid_price(options_data: DataFrame) -> DataFrame:
     """Calculate the mid-price of the options at each strike price.
 
     Args:
@@ -113,8 +108,8 @@ def calculate_mid_price(options_data: pd.DataFrame) -> pd.DataFrame:
 
 
 def calculate_IV(
-    options_data: pd.DataFrame, current_price: float, days_forward: int
-) -> pd.DataFrame:
+    options_data: DataFrame, current_price: float, days_forward: int
+) -> DataFrame:
     """Calculate the implied volatility of the options in options_data
 
     Args:
