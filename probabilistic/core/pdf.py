@@ -5,7 +5,7 @@ from pandas import DataFrame
 from scipy.interpolate import interp1d
 from scipy.stats import norm
 
-from diff_tvr import DiffTVR
+from probabilistic.core.tvr import DiffTVR
 
 
 def calculate_pdf(
@@ -63,7 +63,7 @@ def _calculate_IV(
     years_forward = days_forward / 365
     options_data["iv"] = options_data.apply(
         lambda row: _bs_iv(
-            row.midprice, current_price, row.strike, years_forward, max_iter=500
+            row.mid_price, current_price, row.strike, years_forward, max_iter=500
         ),
         axis=1,
     )
