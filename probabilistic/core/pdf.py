@@ -14,61 +14,11 @@ from diff_tvr import DiffTVR
 ###--- the author's motivation to do this is ostensibly to generate a smoother first derivative --###
 # as shown by the plot, the gaussian filtered IV will only be smoother if the initial data is very unsmooth. Smoothness of the gaussian filtered IV also depends on the smoothing parameter
 # if we were gonna do gaussian filtering, we'll need a way to tune the parameter automatically
-calls_clean["iv_gaussianfilter"] = gaussian_filter1d(calls_clean.iv, 3)
 
 
 # %%
 # FORK 2: using scipy's interp1d to interpolate continuous IV smile
 # academic sources imply that a cubic spline is the standard choice
-
-vol_surface = interp1d(
-    calls_clean.strike, calls_clean.iv, kind="cubic", fill_value="extrapolate"
-)
-# note that I chose to interpolate using the raw IV, without gaussian filtering
-
-# %%
-# plotting the IV smile
-
-# create domain of final PDF
-x_new = np.arange(calls_clean.strike.min(), calls_clean.strike.max(), 0.05)
-
-plt.plot(calls_clean.strike, calls_clean.iv, "bx", x_new, vol_surface(x_new), "k-")
-plt.legend(["smoothed IV", "fitted smile"], loc="best")
-plt.xlabel("Strike")
-plt.ylabel("IV")
-plt.tight_layout()
-# plt.savefig("SPY_smile.png", dpi=300)
-plt.show()
-
-# %%
-# re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
-C_interp = call_value(S, x_new, vol_surface(x_new), t)
-
-# %%
-# plot the implied call prices
-plt.scatter(x=x_new, y=C_interp, s=0.1)
-plt.show()
-
-# --- second derivative of the call options prices ---#
-# using TVR!
-n = len(C_interp)
-
-first_deriv_discrete = np.gradient(C_interp, x_new)
-# plot the first derivative
-plt.scatter(x=x_new, y=first_deriv_discrete)
-plt.show()
-
-
-# Derivative with TVR
-# this is an optimization algorithm, so it will take a long time
-
-diff_tvr = DiffTVR(n, 0.05)
-(deriv_2, _) = diff_tvr.get_deriv_tvr(
-    data=first_deriv_discrete,
-    deriv_guess=np.full(n + 1, 0.0),
-    alpha=10,
-    no_opt_steps=100,
-)
 
 
 def calculate_pdf(
@@ -131,6 +81,44 @@ def calculate_IV(
     )
     options_data = options_data.dropna()
     return options_data
+
+
+def _create_pdf_point_arrays(
+    options_data: DataFrame, current_price: float, days_forward: int
+) -> Tuple[np.array]:
+    """Create two arrays containing x- and y-axis values representing a calculated
+    price PDF
+
+    Args:
+        options_data: a DataFrame containing options price data with
+            cols ['strike', 'bid', 'ask', 'iv']
+        current_price: the current price of the security
+        days_forward: the number of days in the future to estimate the
+            price probability density at
+
+    Returns:
+        a tuple containing x-axis values (index 0) and y-axis values (index 1)
+    """
+    vol_surface = interp1d(
+        options_data.strike, options_data.iv, kind="cubic", fill_value="extrapolate"
+    )
+
+    X = np.arange(options_data.strike.min(), options_data.strike.max(), 0.05)
+
+    # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
+    interpolated = call_value(current_price, X, vol_surface(X), days_forward)
+    first_derivative_discrete = np.gradient(interpolated, X)
+
+    # calculate second derivative of the call options prices using TVR
+    diff_tvr = DiffTVR(len(interpolated), 0.05)
+    (y, _) = diff_tvr.get_deriv_tvr(
+        data=first_derivative_discrete,
+        deriv_guess=np.full(len(interpolated) + 1, 0.0),
+        alpha=10,
+        no_opt_steps=100,
+    )
+
+    return (X, y)
 
 
 def call_value(S, K, sigma, t=0, r=0):
