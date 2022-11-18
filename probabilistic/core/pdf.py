@@ -110,6 +110,7 @@ def _create_pdf_point_arrays(
 
 
 def _call_value(S, K, sigma, t=0, r=0):
+    # TODO: refactor this function (style)
     # use np.multiply and divide to handle divide-by-zero
     with np.errstate(divide="ignore"):
         d1 = np.divide(1, sigma * np.sqrt(t)) * (
@@ -120,6 +121,7 @@ def _call_value(S, K, sigma, t=0, r=0):
 
 
 def _call_vega(S, K, sigma, t=0, r=0):
+    # TODO: refactor this function (style)
     with np.errstate(divide="ignore"):
         d1 = np.divide(1, sigma * np.sqrt(t)) * (
             np.log(S / K) + (r + sigma ** 2 / 2) * t
@@ -138,6 +140,7 @@ def _bs_iv(
     max_iter=1000,
     verbose=False,
 ):
+    # TODO: refactor this function (style)
     iv = initial_guess
     for _ in range(max_iter):
         P = _call_value(S, K, iv, t, r)
