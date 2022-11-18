@@ -9,17 +9,6 @@ from scipy.stats import norm
 
 from diff_tvr import DiffTVR
 
-# FORK: put IV values through a gaussian filter
-# there is no academic reason to do this
-###--- the author's motivation to do this is ostensibly to generate a smoother first derivative --###
-# as shown by the plot, the gaussian filtered IV will only be smoother if the initial data is very unsmooth. Smoothness of the gaussian filtered IV also depends on the smoothing parameter
-# if we were gonna do gaussian filtering, we'll need a way to tune the parameter automatically
-
-
-# %%
-# FORK 2: using scipy's interp1d to interpolate continuous IV smile
-# academic sources imply that a cubic spline is the standard choice
-
 
 def calculate_pdf(
     options_data: DataFrame, current_price: float, days_forward: int
@@ -38,11 +27,11 @@ def calculate_pdf(
         a tuple containing the price and density values (in numpy arrays)
         of the calculated PDF
     """
-    options_data = calculate_mid_price(options_data)
-    options_data = calculate_IV(options_data, current_price, days_forward)
+    options_data = _calculate_mid_price(options_data)
+    options_data = _calculate_IV(options_data, current_price, days_forward)
+    return _create_pdf_point_arrays(options_data, current_price, days_forward)
 
-
-def calculate_mid_price(options_data: DataFrame) -> DataFrame:
+def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
     """Calculate the mid-price of the options at each strike price.
 
     Args:
@@ -57,7 +46,7 @@ def calculate_mid_price(options_data: DataFrame) -> DataFrame:
     return options_data
 
 
-def calculate_IV(
+def _calculate_IV(
     options_data: DataFrame, current_price: float, days_forward: int
 ) -> DataFrame:
     """Calculate the implied volatility of the options in options_data
@@ -74,7 +63,7 @@ def calculate_IV(
     """
     years_forward = days_forward / 365
     options_data["iv"] = options_data.apply(
-        lambda row: bs_iv(
+        lambda row: _bs_iv(
             row.midprice, current_price, row.strike, years_forward, max_iter=500
         ),
         axis=1,
@@ -106,7 +95,7 @@ def _create_pdf_point_arrays(
     X = np.arange(options_data.strike.min(), options_data.strike.max(), 0.05)
 
     # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
-    interpolated = call_value(current_price, X, vol_surface(X), days_forward)
+    interpolated = _call_value(current_price, X, vol_surface(X), days_forward)
     first_derivative_discrete = np.gradient(interpolated, X)
 
     # calculate second derivative of the call options prices using TVR
@@ -121,7 +110,7 @@ def _create_pdf_point_arrays(
     return (X, y)
 
 
-def call_value(S, K, sigma, t=0, r=0):
+def _call_value(S, K, sigma, t=0, r=0):
     # use np.multiply and divide to handle divide-by-zero
     with np.errstate(divide="ignore"):
         d1 = np.divide(1, sigma * np.sqrt(t)) * (
@@ -131,7 +120,7 @@ def call_value(S, K, sigma, t=0, r=0):
     return np.multiply(norm.cdf(d1), S) - np.multiply(norm.cdf(d2), K * np.exp(-r * t))
 
 
-def call_vega(S, K, sigma, t=0, r=0):
+def _call_vega(S, K, sigma, t=0, r=0):
     with np.errstate(divide="ignore"):
         d1 = np.divide(1, sigma * np.sqrt(t)) * (
             np.log(S / K) + (r + sigma ** 2 / 2) * t
@@ -139,7 +128,7 @@ def call_vega(S, K, sigma, t=0, r=0):
     return np.multiply(S, norm.pdf(d1)) * np.sqrt(t)
 
 
-def bs_iv(
+def _bs_iv(
     price,
     S,
     K,
@@ -152,11 +141,11 @@ def bs_iv(
 ):
     iv = initial_guess
     for _ in range(max_iter):
-        P = call_value(S, K, iv, t, r)
+        P = _call_value(S, K, iv, t, r)
         diff = price - P
         if abs(diff) < precision:
             return iv
-        grad = call_vega(S, K, iv, t, r)
+        grad = _call_vega(S, K, iv, t, r)
         iv += diff / grad
     if verbose:
         print(f"Did not converge after {max_iter} iterations")
