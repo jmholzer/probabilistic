@@ -1,10 +1,8 @@
 from typing import Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 from pandas import DataFrame
 from scipy.interpolate import interp1d
-from scipy.ndimage import gaussian_filter1d
 from scipy.stats import norm
 
 from diff_tvr import DiffTVR
@@ -30,6 +28,7 @@ def calculate_pdf(
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
     return _create_pdf_point_arrays(options_data, current_price, days_forward)
+
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
     """Calculate the mid-price of the options at each strike price.
