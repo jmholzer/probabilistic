@@ -94,7 +94,8 @@ def _create_pdf_point_arrays(
     X = np.arange(options_data.strike.min(), options_data.strike.max(), 0.05)
 
     # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
-    interpolated = _call_value(current_price, X, vol_surface(X), days_forward)
+    years_forward = days_forward / 365
+    interpolated = _call_value(current_price, X, vol_surface(X), years_forward)
     first_derivative_discrete = np.gradient(interpolated, X)
 
     # calculate second derivative of the call options prices using TVR
