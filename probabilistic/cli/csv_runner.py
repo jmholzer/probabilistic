@@ -1,14 +1,19 @@
 from probabilistic.io import CSVReader
+from probabilistic.core import calculate_pdf
 
 
-def run(input_csv_path: str) -> None:
+def run(input_csv_path: str, current_price: float, days_forward: int) -> None:
     """Run probabilistic using the data from a CSV file as input
 
     Args:
         input_csv_path: the path of the input CSV file
+        current_price: the current price of the security
+        days_forward: the number of days in the future to estimate the
+            price probability density at
 
     Returns:
         None
     """
     reader = CSVReader()
-    reader.read(input_csv_path)
+    options_data = reader.read(input_csv_path)
+    pdf = calculate_pdf(options_data, current_price, days_forward)
