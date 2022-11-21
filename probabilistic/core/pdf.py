@@ -90,24 +90,30 @@ def _create_pdf_point_arrays(
     vol_surface = interp1d(
         options_data.strike, options_data.iv, kind="cubic", fill_value="extrapolate"
     )
-
-    X = np.arange(options_data.strike.min(), options_data.strike.max(), 0.05)
+    dx_1 = 0.05 # setting dx = 0.05 for the numerical differentiation of 1st derivative
+    X = np.arange(options_data.strike.min(), options_data.strike.max(), dx_1)
 
     # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
     years_forward = days_forward / 365
     interpolated = _call_value(current_price, X, vol_surface(X), years_forward)
     first_derivative_discrete = np.gradient(interpolated, X)
 
+    # to speed up TVR, we increase dx and therefore reduce n
+    dx_2 = dx_1 * 10 # setting dx for the 2nd derivative to be 10x more sparse
+    X_sparse = X[0::10] # array navigation: start at 0, go to end, every 10 values
+    n_sparse = len(X_sparse)
+    first_derivative_sparse = first_derivative_discrete[0::10] # start at 0, go to end, every 10 values
+
     # calculate second derivative of the call options prices using TVR
-    diff_tvr = DiffTVR(len(interpolated), 0.05)
+    diff_tvr = DiffTVR(n_sparse, dx_2)
     (y, _) = diff_tvr.get_deriv_tvr(
-        data=first_derivative_discrete,
-        deriv_guess=np.full(len(interpolated) + 1, 0.0),
+        data=first_derivative_sparse,
+        deriv_guess=np.full(n_sparse + 1, 0.0),
         alpha=10,
         no_opt_steps=100,
-    )
+    )    
 
-    return (X, y)
+    return (X_sparse, y[:len(X_sparse)])
 
 
 def _call_value(S, K, sigma, t=0, r=0):
