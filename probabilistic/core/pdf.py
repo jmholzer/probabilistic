@@ -111,9 +111,9 @@ def _create_pdf_point_arrays(
         deriv_guess=np.full(n_sparse + 1, 0.0),
         alpha=10,
         no_opt_steps=100,
-    )
+    )    
 
-    return (X_sparse, y)
+    return (X_sparse, y[:len(X_sparse)])
 
 
 def _call_value(S, K, sigma, t=0, r=0):
