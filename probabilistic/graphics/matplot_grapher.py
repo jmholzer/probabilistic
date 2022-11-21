@@ -24,6 +24,6 @@ class MatplotGrapher(AbstractGrapher):
         Returns:
             None
         """
-        pyplot.scatter(x=self._pdf[0], y=self._pdf[1][:2500], s=0.1)
+        pyplot.scatter(x=self._pdf[0], y=self._pdf[1], s=0.1)
         pyplot.title(self._title)
         pyplot.show()
