@@ -17,6 +17,8 @@ Method 1 is flawed as an asset's historical price distribution is not necessaril
 
 This package can be used to make positive expected value (EV) bets if you can utilize method 3. If you have some hypothesis that differs from the market consensus, and you use this package to find that the market is under-predicting or over-predicting some realization, then there are positive EV trades you can perform. 
 
+# Why use this package?
+There seems to no existing package to generate future-looking pdfs of an asset's price. If a user wanted to do this themselves, they'd have to wade through academic finance papers to learn the theory and then attempt to put it into code. We provide an off-the-shelf solution. 
 
 # Installation Steps
 
