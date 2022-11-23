@@ -4,9 +4,11 @@ Package generates the forward-looking distribution (probability density function
 # Technical theory
 Source: https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870
 
-Options are contracts used to insure against or speculate/take a view on uncertainty about the future prices of a wide range of financial assets and physical commodities. The prices at which options are traded contain information about the markets’ uncertainty about the future prices of these ‘underlying’ assets. Therefore, we can use a range of options prices to reverse-engineer the implied pdf of an asset's price in the future. This implied pdf can be considered the market's consensus on what the future price will be.
+Options are contracts used to insure against or speculate/take a view on uncertainty about the future prices of a wide range of financial assets and physical commodities. The prices at which options are traded contain information about the markets’ uncertainty about the future prices of these ‘underlying’ assets. 
 
-If we think about the asset's price at some date in the future as a random variable (RV), this RV will have a true pdf. This true pdf can never be observed, but there's certain methods we can use to guess at it.
+Said differently, an option's price is a function of the probability of its event occuring. Therefore, we can use a range of options prices to reverse-engineer the implied pdf of an asset's price in the future. This implied pdf can be considered the market's consensus on what the future price will be.
+
+If we think about the asset's price at some date in the future as a random variable (RV), this RV will have a true pdf. This true pdf can never be observed, but there's certain methods we can use to make our best guess of it. 
 1. assume the best guess for the RV's true pdf is its pdf based on historical data
 2. assume the best guess for the RV's true pdf is its options-implied pdf (which is what this package finds)
 3. use private information to form an expectation about the RV's true pdf
