@@ -15,7 +15,7 @@ If we think about the asset's price at some date in the future as a random varia
 
 Method 1 is flawed as an asset's historical price distribution is not necessarily indicative of its future distribution. This can be easily seen from looking at S&P's 1 month forward-looking distribution at Oct 1 2022, when the risk of nuclear war was higher than ever before. Compared to historical price distribution, the 1-month forward-looking pdf in Oct had a higher left tail (the market had priced in a ~0.5% chance that the S&P dips 50% by end of month). If you used the historical distribution, left-tail risk would have been underestimated. 
 
-This package can be used to make positive expected value bets if you can utilize method 3. If you have some hypothesis that differs from the market consensus, and you use this package to find that the market is under-predicting or over-predicting some realization, then there are positive EV trades you can perform. 
+This package can be used to make positive expected value (EV) bets if you can utilize method 3. If you have some hypothesis that differs from the market consensus, and you use this package to find that the market is under-predicting or over-predicting some realization, then there are positive EV trades you can perform. 
 
 
 # Installation Steps
