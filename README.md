@@ -1,5 +1,5 @@
 # Overview
-Package generates the forward-looking distribution (probability density function, hereafter referred to as 'pdf') of the asset's price at a particular strike-date. 
+Package generates the forward-looking distribution (probability density function, hereafter referred to as 'pdf') of an asset's price at a particular date in the future.
 
 # Technical theory
 Source: https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870
