@@ -1,7 +1,7 @@
 # Overview
 Package generates the forward-looking distribution (probability density function, hereafter referred to as 'pdf') of an asset's price at a particular date in the future.
 
-For example, the below graphic shows the pdf of SPY price on Oct 31 2022, generated only from information that existed on Oct 06 2022. 
+For example, the below graphic shows the pdf of SPY price on Oct 31 2022, generated only from information that existed on Oct 06 2022 (SPY was $373.2 on Oct 06).
 ![pdf of SPY price on 2022-10-31, on 2022-10-06](https://github.com/jmholzer/probabilistic/blob/main/TVR%202nd%20derivative%20alpha10.png)
 
 # Technical theory
