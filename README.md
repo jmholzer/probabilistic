@@ -5,7 +5,7 @@ For example, the below graphic shows the pdf of SPY price on Oct 31 2022, genera
 
 ![pdf of SPY price on 2022-10-31, on 2022-10-06](https://github.com/jmholzer/probabilistic/blob/main/TVR%202nd%20derivative%20alpha10.png)
 
-# Technical theory
+# Simplified theory
 Source: https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870
 
 Options are contracts used to insure against or speculate/take a view on uncertainty about the future prices of a wide range of financial assets and physical commodities. The prices at which options are traded contain information about the markets’ uncertainty about the future prices of these ‘underlying’ assets. 
