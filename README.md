@@ -17,7 +17,7 @@ If we think about the asset's price at some date in the future as a random varia
 2. assume the best guess for the RV's true pdf is the market's consensus of its future pdf (which is what this package finds)
 3. use private information to form an expectation about the RV's true pdf
 
-Method 1 is flawed as an asset's historical price distribution is not necessarily indicative of its future distribution. This can be easily seen from looking at S&P's 1 month forward-looking distribution at Oct 1 2022, when the risk of nuclear war was higher than ever before. Compared to historical price distribution, the 1-month forward-looking pdf in Oct had a higher left tail (the market had priced in a ~0.5% chance that the S&P dips 50% by end of month). If you used the historical distribution, left-tail risk would have been underestimated. 
+Method 1 is flawed as an asset's historical price distribution is not necessarily indicative of its future distribution. This can be easily seen from looking at S&P's 1 month forward-looking distribution at Oct 1 2022, when the risk of nuclear war was higher than ever before. Compared to historical price distribution, the 1-month forward-looking pdf in Oct had a higher left tail (the market had priced in a 0.46% probability that the S&P falls to $2600 by end of month). If you used the historical distribution, left-tail risk would have been underestimated. 
 
 This package can be used to make positive expected value (EV) bets if you can utilize method 3. If you have some hypothesis that differs from the market consensus, and you use this package to find that the market is under-predicting or over-predicting some realization, then there are positive EV trades you can perform. 
 
