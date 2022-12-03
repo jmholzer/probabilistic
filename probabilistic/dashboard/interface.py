@@ -16,20 +16,21 @@ def _max_width_():
     )
 
 
+options_chain = pd.DataFrame({"strike": [], "bid": [], "ask": []})
 st.title("Probabilistic")
-uploaded_file = st.file_uploader(
-    "",
-    key="1"
-)
-if uploaded_file is not None:
-    file_container = st.expander("Check your uploaded .csv")
-    shows = pd.read_csv(uploaded_file)
-else:
+uploaded_file = st.file_uploader("", key="1")
+container = st.empty()
+container.table(options_chain)
+if uploaded_file is None:
     st.info(
         f"""
-            Upload a .csv file containing options data.
-            """
+                Upload a .csv file containing options data.
+                """
     )
-
     st.stop()
-st.table(shows)
+else:
+    file_container = st.expander("Check your uploaded .csv")
+    options_chain = pd.read_csv(uploaded_file)
+
+with container.container():
+    st.table(options_chain)
