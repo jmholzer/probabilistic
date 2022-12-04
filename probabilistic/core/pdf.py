@@ -31,7 +31,7 @@ def calculate_pdf(
     return _create_pdf_point_arrays(options_data, current_price, days_forward)
 
 
-def calculate_cdf(pdf_point_arrays: Tuple[np.array]):
+def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
     """Returns the cumulative probability at each price. Takes as input the array
     of pdf and array of prices, and calculates the cumulative probability as the
     numerical integral over the pdf function.
@@ -54,11 +54,11 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]):
 
     for i in range(n):
         if i == 0:
-            integral = 0.0 + remaining_area/2
+            integral = 0.0 + remaining_area / 2
         else:
-            integral = simps(y=pdf_array[0:i], x=x_array[0:i]) + remaining_area/2
+            integral = simps(y=pdf_array[0:i], x=x_array[0:i]) + remaining_area / 2
         cdf.append(integral)
-    return cdf
+    return [x_array, cdf]
 
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
