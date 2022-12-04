@@ -31,8 +31,7 @@ def calculate_pdf(
     return _create_pdf_point_arrays(options_data, current_price, days_forward)
 
 
-def calculate_cdf(
-    pdf_array: np.array, x_array: np.array) -> np.array:
+def calculate_cdf(pdf_point_arrays: Tuple[np.array]):
     """Returns the cumulative probability at each price. Takes as input the array
     of pdf and array of prices, and calculates the cumulative probability as the
     numerical integral over the pdf function.
@@ -43,10 +42,10 @@ def calculate_cdf(
     remainder of the domain
 
     Args:
-        pdf_array: a np.array of the calculated densities at each price
-        x_array: a np.array of the domain of prices
-
+        pdf_point_arrays: a tuple containing the np.array of the calculated
+        cumulative densities at each price and a np.array of the domain of prices
     """
+    x_array, pdf_array = pdf_point_arrays
     cdf = []
     n = len(x_array)
 
