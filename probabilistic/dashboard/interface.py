@@ -1,5 +1,7 @@
-import streamlit as st
+from pathlib import Path
+
 import pandas as pd
+import streamlit as st
 
 
 def generate_interface() -> None:
@@ -12,7 +14,8 @@ def generate_interface() -> None:
 def generate_title() -> None:
     """Generate the main title of the app.
     """
-    st.title("Probabilistic")
+    logo_path = Path("resources/logo.png").resolve()
+    st.image(str(logo_path))
 
 
 def generate_tab_group() -> None:
