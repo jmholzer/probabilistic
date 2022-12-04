@@ -4,6 +4,7 @@ import numpy as np
 from pandas import DataFrame
 from scipy.interpolate import interp1d
 from scipy.stats import norm
+from scipy.integrate import simps
 
 from probabilistic.core.tvr import DiffTVR
 
@@ -28,6 +29,37 @@ def calculate_pdf(
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
     return _create_pdf_point_arrays(options_data, current_price, days_forward)
+
+
+def calculate_cdf(
+    pdf_array: np.array, x_array: np.array) -> np.array:
+    """Returns the cumulative probability at each price. Takes as input the array
+    of pdf and array of prices, and calculates the cumulative probability as the
+    numerical integral over the pdf function.
+
+    For simplicity, it assumes that the CDF at the starting price
+        = 1 - 0.5*(total area of the pdf)
+    and therefore it adds 0.5*(total area of the pdf) to every cdf for the
+    remainder of the domain
+
+    Args:
+        pdf_array: a np.array of the calculated densities at each price
+        x_array: a np.array of the domain of prices
+
+    """
+    cdf = []
+    n = len(x_array)
+
+    total_area = simps(y=pdf_array[0:n], x=x_array)
+    remaining_area = 1 - total_area
+
+    for i in range(n):
+        if i == 0:
+            integral = 0.0 + remaining_area/2
+        else:
+            integral = simps(y=pdf_array[0:i], x=x_array[0:i]) + remaining_area/2
+        cdf.append(integral)
+    return cdf
 
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
