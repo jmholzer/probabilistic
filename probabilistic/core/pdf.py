@@ -56,7 +56,7 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
         if i == 0:
             integral = 0.0 + remaining_area / 2
         else:
-            integral = simps(y=pdf_array[0:i], x=x_array[0:i]) + remaining_area / 2
+            integral = simps(y=pdf_array[i - 1:i + 1], x=x_array[i - 1:i + 1]) + cdf[-1]
         cdf.append(integral)
     return [x_array, cdf]
 
