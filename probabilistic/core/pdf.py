@@ -44,6 +44,9 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
     Args:
         pdf_point_arrays: a tuple containing the np.array of the calculated
         cumulative densities at each price and a np.array of the domain of prices
+
+    Returns:
+        A tuple containing the price domain and the point values of the CDF
     """
     x_array, pdf_array = pdf_point_arrays
     cdf = []
