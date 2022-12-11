@@ -23,7 +23,7 @@ def generate_title() -> None:
 def generate_body() -> None:
     """Generate the main tab group and populate with data.
     """
-    st.title("Security Details", anchor=None)
+    st.title("Input", anchor=None)
     generate_input_section()
     st.title("Result")
     generate_results()
