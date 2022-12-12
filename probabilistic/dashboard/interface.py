@@ -3,6 +3,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from datetime import datetime
+
 from typing import Optional, Dict
 
 
@@ -32,16 +34,12 @@ def generate_body() -> None:
 def generate_input_section() -> None:
     """Generate content for the input section.
     """
-    security_name = st.text_input(label="Security name", key="security_name")
+    st.text_input(label="Security name", key="security_name")
     c1, c2 = st.columns(2)
     with c1:
-        current_price = st.number_input(
-            label="Current price",
-            step=0.1,
-            key = "current_price",
-        )
+        st.number_input(label="Current price", step=0.1, key = "current_price",)
     with c2:
-        estimate_date = st.date_input(label='Estimate price on', key="estimate_date")
+        st.date_input(label='Estimate price on', key="estimate_date")
 
     st.session_state["calls"] = pd.DataFrame({"strike": [], "bid": [], "ask": []})
     uploaded_file = st.file_uploader("Call options data", key="1")
@@ -65,7 +63,64 @@ def generate_input_section() -> None:
 def generate_results() -> None:
     """Generate content for the results section
     """
-    st.info("Enter valid input to generate results")
+    if not validate_input():
+        return
+
+
+def validate_input() -> bool:
+    """Inspects the app's session_state to check if user input is valid
+
+    Returns:
+        True if the current state of the user's input is valid, else False
+    """
+    return all([
+        _validate_calls(),
+        _validate_current_price(),
+        _validate_estimate_date(),
+    ])
+
+
+def _validate_calls():
+    """Inspects the app's session_state to check if the user's call option input
+    is valid
+
+    Returns:
+        True if the current state of the user's call option data input is valid,
+        else False
+    """
+    calls = st.session_state["calls"]
+    result = calls.size > 0 and set(calls.columns) == {"strike", "bid", "ask"}
+    if not result:
+        st.warning("Call options data must be in the specified form")
+    return result
+
+
+def _validate_current_price():
+    """Inspects the app's session_state to check if the user's current price input
+    is valid
+
+    Returns:
+        True if the current state of the user's current price input is valid,
+        else False
+    """
+    result = st.session_state["current_price"] > 0.0
+    if not result:
+        st.warning("Current price must be greater than 0")
+    return result
+
+
+def _validate_estimate_date():
+    """Inspects the app's session_state to check if the user's estimate date input
+    is valid
+
+    Returns:
+        True if the current state of the user's estimate date input is valid,
+        else False
+    """
+    result = (st.session_state["estimate_date"] - datetime.today().date()).days >= 1
+    if not result:
+        st.warning("Estimate date must be at least one day in the future")
+    return result
 
 
 def _max_width_():
