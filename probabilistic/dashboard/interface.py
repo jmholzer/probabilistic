@@ -5,6 +5,11 @@ import streamlit as st
 
 from datetime import datetime
 
+from probabilistic.io import CSVReader
+from probabilistic.core import calculate_pdf
+from probabilistic.graphics import MatplotGrapher
+
+
 from typing import Optional, Dict
 
 
@@ -66,6 +71,13 @@ def generate_results() -> None:
     if not validate_input():
         return
 
+    reader = CSVReader()
+    options_data = reader.read(st.session_state["calls"])
+    days_forward = _calculate_days_in_future(st.session_state["estimate_date"])
+    pdf = calculate_pdf(options_data, st.session_state["current_price"], days_forward)
+    grapher = MatplotGrapher(pdf)
+    st.pyplot(fig=grapher.generate_pdf_figure())
+
 
 def validate_input() -> bool:
     """Inspects the app's session_state to check if user input is valid
@@ -117,10 +129,14 @@ def _validate_estimate_date():
         True if the current state of the user's estimate date input is valid,
         else False
     """
-    result = (st.session_state["estimate_date"] - datetime.today().date()).days >= 1
+    result = _calculate_days_in_future(st.session_state["estimate_date"]) >= 1
     if not result:
         st.warning("Estimate date must be at least one day in the future")
     return result
+
+
+def _calculate_days_in_future(input_date: datetime.date) -> int:
+    return (input_date - datetime.today().date()).days
 
 
 def _max_width_():
