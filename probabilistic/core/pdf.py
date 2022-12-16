@@ -61,7 +61,7 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
         else:
             integral = simps(y=pdf_array[i - 1:i + 1], x=x_array[i - 1:i + 1]) + cdf[-1]
         cdf.append(integral)
-    return [x_array, cdf]
+    return (x_array, cdf)
 
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
