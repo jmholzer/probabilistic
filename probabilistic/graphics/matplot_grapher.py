@@ -13,7 +13,8 @@ class MatplotGrapher(AbstractGrapher):
         _title: the title of the graph to draw
 
     Methods:
-        draw
+        draw_pdf
+        generate_pdf_figure
     """
 
     def draw_pdf(self) -> None:
