@@ -6,8 +6,8 @@ import streamlit as st
 from datetime import datetime
 
 from probabilistic.io import CSVReader
-from probabilistic.core import calculate_pdf
-from probabilistic.graphics import MatplotGrapher
+from probabilistic.core import calculate_pdf, calculate_cdf
+from probabilistic.graphics import generate_figure
 
 
 from typing import Optional, Dict
@@ -58,10 +58,11 @@ def generate_input_section() -> None:
     with container.container():
         st.dataframe(st.session_state["calls"], width=1024, height=386)
 
-    output_options = st.multiselect(
-        "Show me the following ",
-        ["PDF", "CDF"],
-        ["PDF", "CDF"]
+    st.multiselect(
+        "Optional outputs",
+        ["CDF"],
+        ["CDF"],
+        key="output_options"
     )
 
 
@@ -74,9 +75,14 @@ def generate_results() -> None:
     reader = CSVReader()
     options_data = reader.read(st.session_state["calls"])
     days_forward = _calculate_days_in_future(st.session_state["estimate_date"])
-    pdf = calculate_pdf(options_data, st.session_state["current_price"], days_forward)
-    grapher = MatplotGrapher(pdf)
-    st.pyplot(fig=grapher.generate_pdf_figure())
+
+    with st.spinner(text="In progress..."):
+        pdf = calculate_pdf(options_data, st.session_state["current_price"], days_forward)
+
+    st.pyplot(fig=generate_figure(pdf))
+    if "CDF" in st.session_state["output_options"]:
+        cdf = calculate_cdf(pdf)
+        st.pyplot(fig=generate_figure(cdf))
 
 
 def validate_input() -> bool:
