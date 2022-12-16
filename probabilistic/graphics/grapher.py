@@ -21,14 +21,21 @@ class AbstractGrapher(ABC):
         self._title = title
 
     @abstractmethod
-    def draw(self, pdf: Tuple[np.array]) -> None:
-        """Create a graph of a PDF
-
-        Args:
-            pdf: a tuple containing the x-axis values (index 0) and y-axis values
-                (index 1) of the generated PDF
+    def draw_pdf(self) -> None:
+        """Draw a graph of a PDF
 
         Returns:
             None
+        """
+        pass
+
+    @abstractmethod
+    def generate_pdf_figure(self):
+        """Create a Matplotlib Figure object of a PDF
+
+        Useful for drawing a graph using Streamlit
+
+        Returns:
+            A Matplotlib Figure object of the generated graph
         """
         pass
