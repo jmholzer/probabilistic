@@ -1,7 +1,7 @@
+from typing import Optional, Tuple
+
 from matplotlib import pyplot
 from matplotlib.figure import Figure
-from typing import Tuple, Optional
-
 from numpy import array
 
 
@@ -16,7 +16,9 @@ def draw_figure(density_function: Tuple[array], title: Optional[str] = None) -> 
     pyplot.show()
 
 
-def generate_figure(density_function: Tuple[array], title: Optional[str] = None) -> Figure:
+def generate_figure(
+    density_function: Tuple[array], title: Optional[str] = None
+) -> Figure:
     """Create a Matplotlib Figure object of a PDF
 
     Useful for drawing a graph using Streamlit
