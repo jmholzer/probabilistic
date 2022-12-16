@@ -2,6 +2,8 @@ from matplotlib import pyplot
 
 from probabilistic.graphics import AbstractGrapher
 
+from typing import Any
+
 
 class MatplotGrapher(AbstractGrapher):
     """Implementation of a Grapher that renders a PDF using matplotlib
@@ -14,12 +16,8 @@ class MatplotGrapher(AbstractGrapher):
         draw
     """
 
-    def draw(self) -> None:
-        """Create a graph of a PDF
-
-        Args:
-            pdf: a tuple containing the x-axis values (index 0) and y-axis values
-                (index 1) of the generated PDF
+    def draw_pdf(self) -> None:
+        """Draw a PDF
 
         Returns:
             None
@@ -27,3 +25,15 @@ class MatplotGrapher(AbstractGrapher):
         pyplot.scatter(x=self._pdf[0], y=self._pdf[1], s=0.1)
         pyplot.title(self._title)
         pyplot.show()
+
+    def generate_pdf_figure(self) -> Any:
+        """Create a Matplotlib Figure object of a PDF
+
+        Useful for drawing a graph using Streamlit
+
+        Returns:
+            A Matplotlib Figure object of the generated graph
+        """
+        fig, ax = pyplot.subplots()
+        ax.scatter(x=self._pdf[0], y=self._pdf[1], s=0.1)
+        return fig
