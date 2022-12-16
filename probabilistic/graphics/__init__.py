@@ -1,4 +1,3 @@
-from .grapher import AbstractGrapher
-from .matplot_grapher import MatplotGrapher
+from .matplot import draw_figure, generate_figure
 
-__all__ = ["AbstractGrapher", "MatplotGrapher"]
+__all__ = ["draw_figure", "generate_figure"]
