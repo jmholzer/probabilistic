@@ -13,7 +13,8 @@ class AbstractGrapher(ABC):
         _title: the title of the graph to draw
 
     Methods:
-        draw
+        draw_pdf
+        generate_pdf_figure
     """
 
     def __init__(self, pdf: Tuple[np.array], title: Optional[str] = None) -> None:
