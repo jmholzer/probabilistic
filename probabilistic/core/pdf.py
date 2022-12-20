@@ -1,10 +1,11 @@
-from typing import Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 from pandas import DataFrame
 from scipy.interpolate import interp1d
 from scipy.stats import norm
 from scipy.integrate import simps
+from scipy.optimize import fsolve
 
 from probabilistic.core.tvr import DiffTVR
 
@@ -61,6 +62,23 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
             integral = simps(y=pdf_array[i - 1:i + 1], x=x_array[i - 1:i + 1]) + cdf[-1]
         cdf.append(integral)
     return (x_array, cdf)
+
+
+def calculate_quartiles(cdf_point_arrays: Tuple[np.array]) -> Dict[float, float]:
+    """
+
+    Args:
+        cdf_point_arrays: a tuple containing arrays representing a CDF
+
+    Returns:
+        a DataFrame containing the quartiles of the given CDF
+    """
+    cdf_interpolated = interp1d(cdf_point_arrays[0], cdf_point_arrays[1])
+    return {
+        0.25: fsolve(cdf_interpolated - 0.25, 0),
+        0.5: fsolve(cdf_interpolated - 0.5, 0),
+        0.75: fsolve(cdf_interpolated - 0.75, 0)
+    }
 
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
