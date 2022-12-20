@@ -6,11 +6,8 @@ import streamlit as st
 from datetime import datetime
 
 from probabilistic.io import CSVReader
-from probabilistic.core import calculate_pdf, calculate_cdf
+from probabilistic.core import calculate_pdf, calculate_cdf, quartiles
 from probabilistic.graphics import generate_figure
-
-
-from typing import Optional, Dict
 
 
 def generate_interface() -> None:
@@ -60,7 +57,7 @@ def generate_input_section() -> None:
 
     st.multiselect(
         "Optional outputs",
-        ["CDF"],
+        ["CDF", "Quartiles"],
         ["CDF"],
         key="output_options"
     )
@@ -79,10 +76,17 @@ def generate_results() -> None:
     with st.spinner(text="In progress..."):
         pdf = calculate_pdf(options_data, st.session_state["current_price"], days_forward)
 
+    if (
+        "CDF" in st.session_state["output_options"]
+        or "Quantiles" in st.session_state["output_options"]
+    ):
+        cdf = calculate_cdf(pdf)
+
     st.pyplot(fig=generate_figure(pdf))
     if "CDF" in st.session_state["output_options"]:
-        cdf = calculate_cdf(pdf)
         st.pyplot(fig=generate_figure(cdf))
+    if "Quartiles" in st.session_state["output_options"]:
+        pass
 
 
 def validate_input() -> bool:
