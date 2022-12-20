@@ -1,3 +1,3 @@
-from .matplot import draw_figure, generate_figure
+from .matplot import generate_cdf_figure
 
-__all__ = ["draw_figure", "generate_figure"]
+__all__ = ["generate_cdf_figure"]
