@@ -6,8 +6,8 @@ import streamlit as st
 from datetime import datetime
 
 from probabilistic.io import CSVReader
-from probabilistic.core import calculate_pdf, calculate_cdf, quartiles
-from probabilistic.graphics import generate_figure
+from probabilistic.core import calculate_pdf, calculate_cdf, calculate_quartiles
+from probabilistic.graphics import generate_cdf_figure
 
 
 def generate_interface() -> None:
@@ -66,7 +66,17 @@ def generate_input_section() -> None:
 def generate_results() -> None:
     """Generate content for the results section
     """
-    if not validate_input():
+    import numpy as np
+    with open("cdf.npy", "rb") as f:
+        cdf = np.load(f)
+        cdf = (cdf[0], cdf[1])
+    if "CDF" in st.session_state["output_options"]:
+        cdf_graph = generate_cdf_figure(
+            cdf, "test", st.session_state["estimate_date"], quartiles=True
+        )
+        st.pyplot(fig=cdf_graph)
+
+    """if not validate_input():
         return
 
     reader = CSVReader()
@@ -86,7 +96,7 @@ def generate_results() -> None:
     if "CDF" in st.session_state["output_options"]:
         st.pyplot(fig=generate_figure(cdf))
     if "Quartiles" in st.session_state["output_options"]:
-        pass
+        pass"""
 
 
 def validate_input() -> bool:
@@ -96,11 +106,23 @@ def validate_input() -> bool:
         True if the current state of the user's input is valid, else False
     """
     return all([
+        _validate_security_name(),
         _validate_calls(),
         _validate_current_price(),
         _validate_estimate_date(),
     ])
 
+
+def _validate_security_name():
+    """Inspects the app's session_state to check if the security name is valid
+
+    Returns:
+        True if the current state of the user's security name is valid, else False
+    """
+    result = st.session_state["security_name"] != ""
+    if not result:
+        st.warning("Security name must be specified")
+    return result
 
 def _validate_calls():
     """Inspects the app's session_state to check if the user's call option input
