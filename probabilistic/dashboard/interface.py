@@ -1,32 +1,29 @@
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-from datetime import datetime
-
-from probabilistic.io import CSVReader
-from probabilistic.core import calculate_pdf, calculate_cdf, calculate_quartiles
+from probabilistic.core import (calculate_cdf, calculate_pdf,
+                                calculate_quartiles)
 from probabilistic.graphics import generate_cdf_figure
+from probabilistic.io import CSVReader
 
 
 def generate_interface() -> None:
-    """Main execution path for generating the app.
-    """
+    """Main execution path for generating the app."""
     generate_title()
     generate_body()
 
 
 def generate_title() -> None:
-    """Generate the main title of the app.
-    """
+    """Generate the main title of the app."""
     logo_path = Path("resources/logo.png").resolve()
     st.image(str(logo_path))
 
 
 def generate_body() -> None:
-    """Generate the main tab group and populate with data.
-    """
+    """Generate the main tab group and populate with data."""
     st.title("Input", anchor=None)
     generate_input_section()
     st.title("Result")
@@ -34,14 +31,17 @@ def generate_body() -> None:
 
 
 def generate_input_section() -> None:
-    """Generate content for the input section.
-    """
-    st.text_input(label="Security name", key="security_name")
+    """Generate content for the input section."""
+    st.text_input(label="Security name / ticker", key="security_name")
     c1, c2 = st.columns(2)
     with c1:
-        st.number_input(label="Current price", step=0.1, key = "current_price",)
+        st.number_input(
+            label="Current price",
+            step=0.1,
+            key="current_price",
+        )
     with c2:
-        st.date_input(label='Estimate price on', key="estimate_date")
+        st.date_input(label="Estimate price on", key="estimate_date")
 
     st.session_state["calls"] = pd.DataFrame({"strike": [], "bid": [], "ask": []})
     uploaded_file = st.file_uploader("Call options data", key="1")
@@ -56,17 +56,14 @@ def generate_input_section() -> None:
         st.dataframe(st.session_state["calls"], width=1024, height=386)
 
     st.multiselect(
-        "Optional outputs",
-        ["CDF", "Quartiles"],
-        ["CDF"],
-        key="output_options"
+        "Optional outputs", ["CDF", "Quartiles"], ["CDF"], key="output_options"
     )
 
 
 def generate_results() -> None:
-    """Generate content for the results section
-    """
+    """Generate content for the results section"""
     import numpy as np
+
     with open("cdf.npy", "rb") as f:
         cdf = np.load(f)
         cdf = (cdf[0], cdf[1])
@@ -105,12 +102,14 @@ def validate_input() -> bool:
     Returns:
         True if the current state of the user's input is valid, else False
     """
-    return all([
-        _validate_security_name(),
-        _validate_calls(),
-        _validate_current_price(),
-        _validate_estimate_date(),
-    ])
+    return all(
+        [
+            _validate_security_name(),
+            _validate_calls(),
+            _validate_current_price(),
+            _validate_estimate_date(),
+        ]
+    )
 
 
 def _validate_security_name():
@@ -121,8 +120,9 @@ def _validate_security_name():
     """
     result = st.session_state["security_name"] != ""
     if not result:
-        st.warning("Security name must be specified")
+        st.warning("Security name or ticker must be specified")
     return result
+
 
 def _validate_calls():
     """Inspects the app's session_state to check if the user's call option input
