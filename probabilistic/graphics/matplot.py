@@ -8,6 +8,11 @@ from numpy import array, linspace
 
 from probabilistic.core import calculate_quartiles
 
+from labellines import labelLines
+
+
+pyplot.rcParams['axes.autolimit_mode'] = 'round_numbers'
+
 
 def generate_cdf_figure(
     density_function: Tuple[array],
@@ -35,7 +40,11 @@ def generate_cdf_figure(
     ax.set_xlabel(f"Price")
     ax.set_ylabel("Probability")
 
+    # format x-axis
+    ax.tick_params(axis='x', which='minor', bottom=False)
+
     # format y-axis
+    ax.set_ylim([0, 1])
     ax.ticklabel_format(style="sci", axis="y", scilimits=(0, 0))
     ax.set_yticks(linspace(0, 1, 11))
     ax.yaxis.set_minor_locator(MultipleLocator(0.05))
@@ -44,13 +53,14 @@ def generate_cdf_figure(
         pass
     if quartiles:
         quartile_bounds = calculate_quartiles(density_function)
-
         x_start, x_end = ax.get_xlim()
         y_start, y_end = ax.get_ylim()
         for k, v in quartile_bounds.items():
             xmax = (v - x_start) / (x_end - x_start)
             ymax = (k - y_start) / (y_end - y_start)
-            ax.axvline(x=v, ymax=ymax, color="black", linestyle="--", linewidth=1)
-            ax.axhline(y=k, xmax=xmax, color="black", linestyle="--", linewidth=1)
+            ax.axvline(x=v, ymax=ymax, color="black", linestyle="--", label=f"{v:.0f}")
+            ax.axhline(y=k, xmax=xmax, color="black", linestyle="--")
+
+    labelLines(ax.get_lines(), align=False, zorder=2.5)
 
     return fig
