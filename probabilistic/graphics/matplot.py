@@ -8,7 +8,7 @@ from numpy import array, linspace
 
 from probabilistic.core import calculate_quartiles
 
-from labellines import labelLines
+from labellines import labelLine, labelLines
 
 
 import warnings
@@ -18,13 +18,13 @@ pyplot.rcParams['axes.autolimit_mode'] = 'round_numbers'
 
 def generate_cdf_figure(
     density_function: Tuple[array],
+    *,
     security_ticker: str,
     estimate_date: datetime,
-    *,
     current_price: Optional[Union[float, bool]] = False,
     quartiles: Optional[bool] = False,
 ) -> Figure:
-    """Create a Matplotlib Figure object of a PDF
+    """Create a Matplotlib Figure object of a CDF
 
     Useful for drawing a graph using Streamlit
 
@@ -52,7 +52,11 @@ def generate_cdf_figure(
     ax.yaxis.set_minor_locator(MultipleLocator(0.05))
 
     if current_price:
-        pass
+        label = f"{current_price:.2f}"
+        line = ax.axvline(
+            x=current_price, color="green", linestyle=":", label=label, linewidth=0.75
+        )
+        _label_line_no_warnings(line, x=current_price, yoffset=-0.3)
     if quartiles:
         quartile_bounds = calculate_quartiles(density_function)
         x_start, x_end = ax.get_xlim()
@@ -60,11 +64,16 @@ def generate_cdf_figure(
         for k, v in quartile_bounds.items():
             xmax = (v - x_start) / (x_end - x_start)
             ymax = (k - y_start) / (y_end - y_start)
-            ax.axvline(x=v, ymax=ymax, color="black", linestyle="--", label=f"{v:.0f}")
+            label = f"{v:.2f}"
+            line = ax.axvline(x=v, ymax=ymax, color="black", linestyle="--", label=label)
+            label_y_offset = -(ymax / 2) + 0.05
+            _label_line_no_warnings(line, x=v, align=False, yoffset=label_y_offset)
             ax.axhline(y=k, xmax=xmax, color="black", linestyle="--")
 
+    return fig
+
+
+def _label_line_no_warnings(line, **params) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        labelLines(ax.get_lines(), align=False, zorder=2.5)
-
-    return fig
+        labelLine(line, **params)
