@@ -11,7 +11,7 @@ from probabilistic.core import calculate_quartiles
 
 def generate_cdf_figure(
     density_function: Tuple[array],
-    security_name: str,
+    security_ticker: str,
     estimate_date: datetime,
     *,
     current_price: Optional[Union[float, bool]] = False,
@@ -28,7 +28,7 @@ def generate_cdf_figure(
     ax.plot(density_function[0], density_function[1])
     ax.set_title(
         f"Cumulative Density Function of the price of"
-        f"\n{security_name} on {estimate_date}"
+        f"\n{security_ticker} on {estimate_date}"
     )
 
     # add axis titles
