@@ -16,6 +16,40 @@ import warnings
 pyplot.rcParams['axes.autolimit_mode'] = 'round_numbers'
 
 
+def generate_pdf_figure(
+    density_function: Tuple[array],
+    *,
+    security_ticker: str,
+    estimate_date: datetime,
+    current_price: Optional[Union[float, bool]] = False,
+) -> Figure:
+    fig, ax = pyplot.subplots()
+    ax.plot(density_function[0], density_function[1])
+    ax.set_title(
+        f"Probability Density Function of the price of"
+        f"\n{security_ticker} on {estimate_date}"
+    )
+
+    # add axis titles
+    ax.set_xlabel(f"Price")
+    ax.set_ylabel("Probability")
+
+    # format x-axis
+    ax.tick_params(axis='x', which='minor', bottom=False)
+
+    # format y-axis
+    ax.ticklabel_format(style="sci", axis="y", scilimits=(0, 0))
+
+    if current_price:
+        label = f"{current_price:.2f}"
+        line = ax.axvline(
+            x=current_price, color="green", linestyle=":", label=label, linewidth=0.75
+        )
+        _label_line_no_warnings(line, x=current_price, yoffset=-0.3)
+
+    return fig
+
+
 def generate_cdf_figure(
     density_function: Tuple[array],
     *,
