@@ -11,6 +11,8 @@ from probabilistic.core import calculate_quartiles
 from labellines import labelLines
 
 
+import warnings
+
 pyplot.rcParams['axes.autolimit_mode'] = 'round_numbers'
 
 
@@ -61,6 +63,8 @@ def generate_cdf_figure(
             ax.axvline(x=v, ymax=ymax, color="black", linestyle="--", label=f"{v:.0f}")
             ax.axhline(y=k, xmax=xmax, color="black", linestyle="--")
 
-    labelLines(ax.get_lines(), align=False, zorder=2.5)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        labelLines(ax.get_lines(), align=False, zorder=2.5)
 
     return fig
