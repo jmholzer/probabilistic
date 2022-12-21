@@ -32,7 +32,7 @@ def generate_body() -> None:
 
 def generate_input_section() -> None:
     """Generate content for the input section."""
-    st.text_input(label="Security name / ticker", key="security_name")
+    st.text_input(label="Security ticker symbol", key="security_ticker")
     c1, c2 = st.columns(2)
     with c1:
         st.number_input(
@@ -104,7 +104,7 @@ def validate_input() -> bool:
     """
     return all(
         [
-            _validate_security_name(),
+            _validate_security_ticker(),
             _validate_calls(),
             _validate_current_price(),
             _validate_estimate_date(),
@@ -112,15 +112,16 @@ def validate_input() -> bool:
     )
 
 
-def _validate_security_name():
-    """Inspects the app's session_state to check if the security name is valid
+def _validate_security_ticker():
+    """Inspects the app's session_state to check if the security ticker is valid
 
     Returns:
         True if the current state of the user's security name is valid, else False
     """
-    result = st.session_state["security_name"] != ""
+    # assuming a valid ticker is between 1 and 6 characters long
+    result = 1 <= len(st.session_state["security_ticker"]) <= 6
     if not result:
-        st.warning("Security name or ticker must be specified")
+        st.warning("A valid ticker symbol must be specified")
     return result
 
 
