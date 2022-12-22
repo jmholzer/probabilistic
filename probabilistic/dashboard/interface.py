@@ -17,7 +17,8 @@ def generate_interface() -> None:
 
 def generate_title() -> None:
     """Generate the main title of the app."""
-    logo_path = Path("resources/logo.png").resolve()
+    interface_path = Path(__file__).parent.resolve()
+    logo_path = interface_path / Path("resources/logo.png")
     st.image(str(logo_path))
 
 
