@@ -108,7 +108,6 @@ def generate_cdf_figure(
 
 
 def _label_line_no_warnings(line, **params) -> None:
-    print(f"getting here {params}")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         labelLine(line, **params)
