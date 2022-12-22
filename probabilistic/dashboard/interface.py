@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-
 from probabilistic.core import (calculate_cdf, calculate_pdf,
                                 calculate_quartiles)
-from probabilistic.graphics import generate_cdf_figure
+from probabilistic.graphics import generate_cdf_figure, generate_pdf_figure
 from probabilistic.io import CSVReader
 
 
@@ -62,18 +61,7 @@ def generate_input_section() -> None:
 
 def generate_results() -> None:
     """Generate content for the results section"""
-    import numpy as np
-
-    with open("cdf.npy", "rb") as f:
-        cdf = np.load(f)
-        cdf = (cdf[0], cdf[1])
-    if "CDF" in st.session_state["output_options"]:
-        cdf_graph = generate_cdf_figure(
-            cdf, "test", st.session_state["estimate_date"], quartiles=True
-        )
-        st.pyplot(fig=cdf_graph)
-
-    """if not validate_input():
+    if not validate_input():
         return
 
     reader = CSVReader()
@@ -81,19 +69,35 @@ def generate_results() -> None:
     days_forward = _calculate_days_in_future(st.session_state["estimate_date"])
 
     with st.spinner(text="In progress..."):
-        pdf = calculate_pdf(options_data, st.session_state["current_price"], days_forward)
+        pdf = calculate_pdf(
+            options_data, st.session_state["current_price"], days_forward
+        )
 
     if (
         "CDF" in st.session_state["output_options"]
-        or "Quantiles" in st.session_state["output_options"]
+        or "Quartiles" in st.session_state["output_options"]
     ):
         cdf = calculate_cdf(pdf)
 
-    st.pyplot(fig=generate_figure(pdf))
+    pdf_graph = generate_pdf_figure(
+        pdf,
+        security_ticker=st.session_state["security_ticker"],
+        estimate_date=st.session_state["estimate_date"],
+        current_price=st.session_state["current_price"],
+    )
+    st.pyplot(fig=pdf_graph)
+
     if "CDF" in st.session_state["output_options"]:
-        st.pyplot(fig=generate_figure(cdf))
+        cdf_graph = generate_cdf_figure(
+            cdf,
+            security_ticker=st.session_state["security_ticker"],
+            estimate_date=st.session_state["estimate_date"],
+            current_price=st.session_state["current_price"],
+            quartiles=True,
+        )
+        st.pyplot(fig=cdf_graph)
     if "Quartiles" in st.session_state["output_options"]:
-        pass"""
+        pass
 
 
 def validate_input() -> bool:
