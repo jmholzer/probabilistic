@@ -1,7 +1,6 @@
-from probabilistic.cli import cli
-from probabilistic.cli import csv_runner
-
 from click.testing import CliRunner
+
+from probabilistic.cli import cli, csv_runner
 
 
 def test_calculate_csv(mocker):

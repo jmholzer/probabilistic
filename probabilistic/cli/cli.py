@@ -5,8 +5,7 @@ from . import csv_runner
 
 @click.group(name="probabilistic")
 def cli():
-    """Defines a click group for the whole project
-    """
+    """Defines a click group for the whole project"""
     pass
 
 
