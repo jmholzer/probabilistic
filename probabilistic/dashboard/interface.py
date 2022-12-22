@@ -55,7 +55,7 @@ def generate_input_section() -> None:
         st.dataframe(st.session_state["calls"], width=1024, height=386)
 
     st.multiselect(
-        "Optional outputs", ["CDF", "Quartiles"], ["CDF"], key="output_options"
+        "Optional outputs", ["CDF"], ["CDF"], key="output_options"
     )
 
 
@@ -68,16 +68,10 @@ def generate_results() -> None:
     options_data = reader.read(st.session_state["calls"])
     days_forward = _calculate_days_in_future(st.session_state["estimate_date"])
 
-    with st.spinner(text="In progress..."):
+    with st.spinner(text="Calculating..."):
         pdf = calculate_pdf(
             options_data, st.session_state["current_price"], days_forward
         )
-
-    if (
-        "CDF" in st.session_state["output_options"]
-        or "Quartiles" in st.session_state["output_options"]
-    ):
-        cdf = calculate_cdf(pdf)
 
     pdf_graph = generate_pdf_figure(
         pdf,
@@ -90,6 +84,8 @@ def generate_results() -> None:
     st.markdown("""---""")
 
     if "CDF" in st.session_state["output_options"]:
+        with st.spinner(text="Calculating..."):
+            cdf = calculate_cdf(pdf)
         cdf_graph = generate_cdf_figure(
             cdf,
             security_ticker=st.session_state["security_ticker"],
@@ -100,8 +96,6 @@ def generate_results() -> None:
         st.subheader("CDF")
         st.pyplot(fig=cdf_graph)
         st.markdown("""---""")
-    if "Quartiles" in st.session_state["output_options"]:
-        pass
 
 
 def validate_input() -> bool:
