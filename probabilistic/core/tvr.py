@@ -1,11 +1,10 @@
+from typing import Tuple
+
 import numpy as np
 from scipy.linalg import solve
 
-from typing import Tuple
-
 
 class DiffTVR:
-
     def __init__(self, n: int, dx: float):
         """Differentiate with TVR.
         Args:
@@ -88,7 +87,9 @@ class DiffTVR:
         """
         return self.dx * np.transpose(self.d_mat) @ en_mat @ self.d_mat
 
-    def make_gn_vec(self, deriv_curr: np.array, data: np.array, alpha: float, ln_mat: np.array) -> np.array:
+    def make_gn_vec(
+        self, deriv_curr: np.array, data: np.array, alpha: float, ln_mat: np.array
+    ) -> np.array:
         """Negative right hand side of linear problem
         Args:
             deriv_curr (np.array): Current derivative of size N+1
@@ -98,7 +99,11 @@ class DiffTVR:
         Returns:
             np.array: Vector of length N+1
         """
-        return self.a_mat_t @ self.a_mat @ deriv_curr - self.a_mat_t @ (data - data[0]) + alpha * ln_mat @ deriv_curr
+        return (
+            self.a_mat_t @ self.a_mat @ deriv_curr
+            - self.a_mat_t @ (data - data[0])
+            + alpha * ln_mat @ deriv_curr
+        )
 
     def make_hn_mat(self, alpha: float, ln_mat: np.array) -> np.array:
         """Matrix in linear problem
@@ -110,7 +115,9 @@ class DiffTVR:
         """
         return self.a_mat_t @ self.a_mat + alpha * ln_mat
 
-    def get_deriv_tvr_update(self, data: np.array, deriv_curr: np.array, alpha: float) -> np.array:
+    def get_deriv_tvr_update(
+        self, data: np.array, deriv_curr: np.array, alpha: float
+    ) -> np.array:
         """Get the TVR update
         Args:
             data (np.array): Data of size N
@@ -122,36 +129,27 @@ class DiffTVR:
 
         n = len(data)
 
-        en_mat = self.make_en_mat(
-            deriv_curr=deriv_curr
-        )
+        en_mat = self.make_en_mat(deriv_curr=deriv_curr)
 
-        ln_mat = self.make_ln_mat(
-            en_mat=en_mat
-        )
+        ln_mat = self.make_ln_mat(en_mat=en_mat)
 
-        hn_mat = self.make_hn_mat(
-            alpha=alpha,
-            ln_mat=ln_mat
-        )
+        hn_mat = self.make_hn_mat(alpha=alpha, ln_mat=ln_mat)
 
         gn_vec = self.make_gn_vec(
-            deriv_curr=deriv_curr,
-            data=data,
-            alpha=alpha,
-            ln_mat=ln_mat
+            deriv_curr=deriv_curr, data=data, alpha=alpha, ln_mat=ln_mat
         )
 
         return solve(hn_mat, -gn_vec)
 
-    def get_deriv_tvr(self,
-                      data: np.array,
-                      deriv_guess: np.array,
-                      alpha: float,
-                      no_opt_steps: int,
-                      return_progress: bool = False,
-                      return_interval: int = 1
-                      ) -> Tuple[np.array, np.array]:
+    def get_deriv_tvr(
+        self,
+        data: np.array,
+        deriv_guess: np.array,
+        alpha: float,
+        no_opt_steps: int,
+        return_progress: bool = False,
+        return_interval: int = 1,
+    ) -> Tuple[np.array, np.array]:
         """Get derivative via TVR over optimization steps
         Args:
             data (np.array): Data of size N
@@ -173,9 +171,7 @@ class DiffTVR:
 
         for opt_step in range(0, no_opt_steps):
             update = self.get_deriv_tvr_update(
-                data=data,
-                deriv_curr=deriv_curr,
-                alpha=alpha
+                data=data, deriv_curr=deriv_curr, alpha=alpha
             )
 
             deriv_curr += update
