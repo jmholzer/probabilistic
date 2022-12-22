@@ -4,7 +4,7 @@ import numpy as np
 from pandas import DataFrame
 from scipy.integrate import simps
 from scipy.interpolate import interp1d
-from scipy.optimize import fsolve
+from scipy.optimize import brentq
 from scipy.stats import norm
 
 from probabilistic.core.tvr import DiffTVR
@@ -63,6 +63,7 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
                 simps(y=pdf_array[i - 1 : i + 1], x=x_array[i - 1 : i + 1]) + cdf[-1]
             )
         cdf.append(integral)
+
     return (x_array, cdf)
 
 
@@ -76,10 +77,11 @@ def calculate_quartiles(cdf_point_arrays: Tuple[np.array]) -> Dict[float, float]
         a DataFrame containing the quartiles of the given CDF
     """
     cdf_interpolated = interp1d(cdf_point_arrays[0], cdf_point_arrays[1])
+    x_start, x_end = cdf_point_arrays[0][0], cdf_point_arrays[0][-1]
     return {
-        0.25: fsolve(cdf_interpolated - 0.25, 0),
-        0.5: fsolve(cdf_interpolated - 0.5, 0),
-        0.75: fsolve(cdf_interpolated - 0.75, 0),
+        0.25: brentq(lambda x: cdf_interpolated(x) - 0.25, x_start, x_end),
+        0.5: brentq(lambda x: cdf_interpolated(x) - 0.5, x_start, x_end),
+        0.75: brentq(lambda x: cdf_interpolated(x) - 0.75, x_start, x_end),
     }
 
 
