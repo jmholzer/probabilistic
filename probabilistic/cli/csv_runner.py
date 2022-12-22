@@ -1,6 +1,6 @@
-from probabilistic.io import CSVReader
 from probabilistic.core import calculate_pdf
 from probabilistic.graphics import draw_figure
+from probabilistic.io import CSVReader
 
 
 def run(input_csv_path: str, current_price: float, days_forward: int) -> None:

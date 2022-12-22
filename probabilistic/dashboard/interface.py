@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-from probabilistic.core import (calculate_cdf, calculate_pdf,
-                                calculate_quartiles)
+
+from probabilistic.core import calculate_cdf, calculate_pdf
 from probabilistic.graphics import generate_cdf_figure, generate_pdf_figure
 from probabilistic.io import CSVReader
 
@@ -54,9 +54,7 @@ def generate_input_section() -> None:
     with container.container():
         st.dataframe(st.session_state["calls"], width=1024, height=386)
 
-    st.multiselect(
-        "Optional outputs", ["CDF"], ["CDF"], key="output_options"
-    )
+    st.multiselect("Optional outputs", ["CDF"], ["CDF"], key="output_options")
 
 
 def generate_results() -> None:
