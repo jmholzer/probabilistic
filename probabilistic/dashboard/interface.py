@@ -85,7 +85,9 @@ def generate_results() -> None:
         estimate_date=st.session_state["estimate_date"],
         current_price=st.session_state["current_price"],
     )
+    st.subheader("PDF")
     st.pyplot(fig=pdf_graph)
+    st.markdown("""---""")
 
     if "CDF" in st.session_state["output_options"]:
         cdf_graph = generate_cdf_figure(
@@ -95,7 +97,9 @@ def generate_results() -> None:
             current_price=st.session_state["current_price"],
             quartiles=True,
         )
+        st.subheader("CDF")
         st.pyplot(fig=cdf_graph)
+        st.markdown("""---""")
     if "Quartiles" in st.session_state["output_options"]:
         pass
 
