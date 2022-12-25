@@ -1,25 +1,23 @@
-from typing import List, Iterable
+from typing import Iterable
 import sys
 import click
 import subprocess
 import shlex
 
 
-def call(cmd: List[str], **kwargs):  # pragma: no cover
-    """Run a subprocess command and raise if it fails.
-    Args:
-        cmd: List of command parts.
-        **kwargs: Optional keyword arguments passed to `subprocess.run`.
+def python_call(module: str, arguments: Iterable[str], **kwargs):
+    """Run a subprocess command that invokes a Python module.
+
+    Arguments:
+        module: The module to invoke.
+        arguments: The arguments to pass to the module.
+        **kwargs: Additional keyword arguments to pass to subprocess.run.
+
     Raises:
-        click.exceptions.Exit: If `subprocess.run` returns non-zero code.
+        subprocess.CalledProcessError: If the subprocess call fails.
     """
-    click.echo(" ".join(shlex.quote(c) for c in cmd))
-    # pylint: disable=subprocess-run-check
-    code = subprocess.run(cmd, **kwargs).returncode
-    if code:
-        raise click.exceptions.Exit(code=code)
-
-
-def python_call(module: str, arguments: Iterable[str], **kwargs):  # pragma: no cover
-    """Run a subprocess command that invokes a Python module."""
-    call([sys.executable, "-m", module] + list(arguments), **kwargs)
+    command = [sys.executable, "-m", module] + list(arguments)
+    click.echo(" ".join(shlex.quote(cmd) for cmd in command))
+    return_code = subprocess.run(command, **kwargs).returncode
+    if return_code == 1:
+        raise click.exceptions.Exit(code=return_code)
