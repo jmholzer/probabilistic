@@ -1,9 +1,15 @@
+import pathlib
+
 import click
+from click_default_group import DefaultGroup
 
 from . import csv_runner
+from .utils import python_call
 
 
-@click.group(name="probabilistic")
+@click.group(
+    cls=DefaultGroup, name="probabilistic", default="run", default_if_no_args=True
+)
 def cli():
     """Defines a click group for the whole project"""
     pass
@@ -28,6 +34,14 @@ def calculate(input_csv_path: str, current_price: float, days_forward: int) -> N
     if input_csv_path:
         # TODO: Get rid of this casting in a neat way
         csv_runner.run(input_csv_path, float(current_price), int(days_forward))
+
+
+@cli.command()
+def run() -> None:
+    """The CLI endpoint for running the probabilistic interface"""
+    root_path = pathlib.Path(__file__).parent.parent.resolve()
+    interface_path = root_path / pathlib.Path("dashboard/interface.py")
+    python_call("streamlit", ("run", str(interface_path)))
 
 
 def main() -> None:

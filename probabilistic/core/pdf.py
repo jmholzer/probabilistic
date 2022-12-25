@@ -96,7 +96,7 @@ def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
         the options_data DataFrame, with an additional column for mid-price
     """
     options_data["mid_price"] = (options_data.bid + options_data.ask) / 2
-    options_data = options_data[options_data.mid_price > 0]
+    options_data = options_data[options_data.mid_price >= 0]
     return options_data
 
 
