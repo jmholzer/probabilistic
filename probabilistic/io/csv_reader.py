@@ -28,7 +28,7 @@ class CSVReader(AbstractReader):
         Arguments:
             raw_data: the raw data ingested from the data source
         """
-        raw_data["strike"] = raw_data["strike"].astype(np.int64)
+        raw_data["strike"] = raw_data["strike"].astype(np.float64)
         raw_data["bid"] = raw_data["bid"].astype(np.float64)
         raw_data["ask"] = raw_data["ask"].astype(np.float64)
         return raw_data
