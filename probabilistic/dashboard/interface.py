@@ -174,20 +174,6 @@ def _calculate_days_in_future(input_date: datetime.date) -> int:
     return (input_date - datetime.today().date()).days
 
 
-def _max_width_():
-    max_width_str = f"max-width: 1800px;"
-    st.markdown(
-        f"""
-        <style>
-            .reportview-container .main .block-container{{
-                {max_width_str}
-            }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def _set_page_upper_margin():
     """Set the upper margin of the page to 0"""
     st.markdown(
@@ -200,10 +186,6 @@ def _set_page_upper_margin():
         """,
         unsafe_allow_html=True,
     )
-
-
-BACKGROUND_COLOR = "white"
-COLOR = "black"
 
 
 if __name__ == "__main__":
