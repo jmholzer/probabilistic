@@ -182,7 +182,7 @@ def _max_width_():
             .reportview-container .main .block-container{{
                 {max_width_str}
             }}
-        </style>    
+        </style>
         """,
         unsafe_allow_html=True,
     )
@@ -191,17 +191,19 @@ def _max_width_():
 def _set_page_upper_margin():
     """Set the upper margin of the page to 0"""
     st.markdown(
-        f'''
+        f"""
             <style>
                 .appview-container .main .block-container{{
                     padding-top: {0}rem;
                 }}
             </style>
-    ''', unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
 
-BACKGROUND_COLOR = 'white'
-COLOR = 'black'
+BACKGROUND_COLOR = "white"
+COLOR = "black"
 
 
 if __name__ == "__main__":
