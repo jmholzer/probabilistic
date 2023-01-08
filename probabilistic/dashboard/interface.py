@@ -194,7 +194,7 @@ def _set_page_upper_margin():
         f"""
             <style>
                 .appview-container .main .block-container{{
-                    padding-top: {0}rem;
+                    padding-top: {3}rem;
                 }}
             </style>
         """,
