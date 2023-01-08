@@ -11,6 +11,7 @@ from probabilistic.io import CSVReader
 
 def generate_interface() -> None:
     """Main execution path for generating the app."""
+    _set_page_upper_margin()
     generate_title()
     generate_body()
 
@@ -19,7 +20,7 @@ def generate_title() -> None:
     """Generate the main title of the app."""
     interface_path = Path(__file__).parent.resolve()
     logo_path = interface_path / Path("resources/logo.png")
-    st.image(str(logo_path))
+    st.image(str(logo_path), use_column_width=True)
 
 
 def generate_body() -> None:
@@ -185,6 +186,22 @@ def _max_width_():
         """,
         unsafe_allow_html=True,
     )
+
+
+def _set_page_upper_margin():
+    """Set the upper margin of the page to 0"""
+    st.markdown(
+        f'''
+            <style>
+                .appview-container .main .block-container{{
+                    padding-top: {0}rem;
+                }}
+            </style>
+    ''', unsafe_allow_html=True)
+
+
+BACKGROUND_COLOR = 'white'
+COLOR = 'black'
 
 
 if __name__ == "__main__":
