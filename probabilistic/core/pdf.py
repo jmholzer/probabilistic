@@ -27,8 +27,6 @@ def calculate_pdf(
         a tuple containing the price and density values (in numpy arrays)
         of the calculated PDF
     """
-    with open("options_data.csv", "w") as f:
-        f.write(options_data.to_csv())
     options_data, min_strike, max_strike = _extrapolate_call_prices(options_data, current_price)
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
