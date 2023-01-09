@@ -1,7 +1,7 @@
 from typing import Dict, Tuple
 
 import numpy as np
-from pandas import DataFrame
+from pandas import concat, DataFrame
 from scipy.integrate import simps
 from scipy.interpolate import interp1d
 from scipy.optimize import brentq
@@ -27,9 +27,13 @@ def calculate_pdf(
         a tuple containing the price and density values (in numpy arrays)
         of the calculated PDF
     """
+    with open("options_data.csv", "w") as f:
+        f.write(options_data.to_csv())
+    options_data, min_strike, max_strike = _extrapolate_call_prices(options_data, current_price)
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
-    return _create_pdf_point_arrays(options_data, current_price, days_forward)
+    pdf = _create_pdf_point_arrays(options_data, current_price, days_forward)
+    return _crop_pdf(pdf, min_strike, max_strike)
 
 
 def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
@@ -83,6 +87,33 @@ def calculate_quartiles(cdf_point_arrays: Tuple[np.array]) -> Dict[float, float]
         0.5: brentq(lambda x: cdf_interpolated(x) - 0.5, x_start, x_end),
         0.75: brentq(lambda x: cdf_interpolated(x) - 0.75, x_start, x_end),
     }
+
+
+def _extrapolate_call_prices(
+    options_data: DataFrame, current_price: float
+) -> DataFrame:
+    """Extrapolate the price of the call options to strike prices outside
+    the range of options_data. Extrapolation is done to zero and twice the
+    highest strike price in options_data.
+
+    Args:
+        options_data: a DataFrame containing options price data with
+            cols ['strike', 'bid', 'ask']
+        current_price: the current price of the security
+
+    Returns:
+        the extended options_data DataFrame
+    """
+    min_strike = int(options_data.strike.min())
+    max_strike = int(options_data.strike.max())
+    lower_extrapolation = DataFrame(
+        {"strike": p, "bid": current_price - p, "ask": current_price - p}
+        for p in range(0, min_strike)
+    )
+    upper_extrapolation = DataFrame(
+        {"strike": p, "bid": 0, "ask": 0} for p in range(max_strike + 1, max_strike * 2)
+    )
+    return concat([lower_extrapolation, options_data, upper_extrapolation]), min_strike, max_strike
 
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
@@ -145,8 +176,8 @@ def _create_pdf_point_arrays(
     vol_surface = interp1d(
         options_data.strike, options_data.iv, kind="cubic", fill_value="extrapolate"
     )
-    dx_1 = 0.05  # setting dx = 0.05 for the numerical differentiation of 1st derivative
-    X = np.arange(options_data.strike.min(), options_data.strike.max(), dx_1)
+    dx = 0.05  # setting dx = 0.05 for the numerical differentiation of 1st derivative
+    X = np.arange(options_data.strike.min(), options_data.strike.max(), dx)
 
     # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
     years_forward = days_forward / 365
@@ -154,7 +185,6 @@ def _create_pdf_point_arrays(
     first_derivative_discrete = np.gradient(interpolated, X)
 
     # to speed up TVR, we increase dx and therefore reduce n
-    dx_2 = dx_1 * 10  # setting dx for the 2nd derivative to be 10x more sparse
     X_sparse = X[0::10]  # array navigation: start at 0, go to end, every 10 values
     n_sparse = len(X_sparse)
     first_derivative_sparse = first_derivative_discrete[
@@ -162,15 +192,25 @@ def _create_pdf_point_arrays(
     ]  # start at 0, go to end, every 10 values
 
     # calculate second derivative of the call options prices using TVR
-    diff_tvr = DiffTVR(n_sparse, dx_2)
+    diff_tvr = DiffTVR(n_sparse, dx * 10)
     (y, _) = diff_tvr.get_deriv_tvr(
         data=first_derivative_sparse,
         deriv_guess=np.full(n_sparse + 1, 0.0),
         alpha=10,
-        no_opt_steps=100,
+        no_opt_steps=10,
     )
 
     return (X_sparse, y[: len(X_sparse)])
+
+
+def _crop_pdf(pdf: Tuple[np.array], min_strike: float, max_strike: float) -> Tuple[np.array]:
+    """Crop the PDF to the range of the original options data"""
+    l, r = 0, len(pdf[0]) - 1
+    while pdf[0][l] < min_strike:
+        l += 1
+    while pdf[0][r] > max_strike:
+        r -= 1
+    return pdf[0][l:r + 1], pdf[1][l:r + 1]
 
 
 def _call_value(S, K, sigma, t=0, r=0):
