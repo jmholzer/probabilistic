@@ -65,6 +65,14 @@ The process of generating the PDFs, CDFs, and quartiles is as follows:
 
 This tool can provide insights into market expectations for the future price of an asset based on current options prices. For instance, if you want to anticipate the likely price of a stock 30 days from now, you could use this tool to calculate the PDF and CDF from the stock's current options data, and inspect the distribution quartiles to understand the range of probable prices.
 
+## Examples
+
+An example of the input and output for the sample SPY options chain data for the date of 30/06/23 (taken on 04/06/23)  included in `data/` is:
+
+![Probabilistic example input](.meta/images/probabilistic_example_input.png)
+
+![Probabilistic example output](.meta/images/probabilistic_example_output.png)
+
 ## License
 
 This project is a preview, it is not currently licensed. Not financial advice.
