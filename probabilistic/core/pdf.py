@@ -12,7 +12,7 @@ from probabilistic.core.tvr import DiffTVR
 
 def calculate_pdf(
     options_data: DataFrame, current_price: float, days_forward: int
-) -> Tuple[np.array]:
+) -> Tuple[np.ndarray]:
     """The main execution path for the pdf module. Takes a `DataFrame` of
     options data as input and makes a series of function calls to
 
@@ -27,14 +27,18 @@ def calculate_pdf(
         a tuple containing the price and density values (in numpy arrays)
         of the calculated PDF
     """
-    options_data, min_strike, max_strike = _extrapolate_call_prices(options_data, current_price)
+    options_data, min_strike, max_strike = _extrapolate_call_prices(
+        options_data, current_price
+    )
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
     pdf = _create_pdf_point_arrays(options_data, current_price, days_forward)
     return _crop_pdf(pdf, min_strike, max_strike)
 
 
-def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
+def calculate_cdf(
+    pdf_point_arrays: Tuple[np.ndarray, np.ndarray]
+) -> Tuple[np.ndarray, np.ndarray]:
     """Returns the cumulative probability at each price. Takes as input the array
     of pdf and array of prices, and calculates the cumulative probability as the
     numerical integral over the pdf function.
@@ -69,7 +73,9 @@ def calculate_cdf(pdf_point_arrays: Tuple[np.array]) -> Tuple[np.array]:
     return (x_array, cdf)
 
 
-def calculate_quartiles(cdf_point_arrays: Tuple[np.array]) -> Dict[float, float]:
+def calculate_quartiles(
+    cdf_point_arrays: Tuple[np.ndarray, np.ndarray]
+) -> Dict[float, float]:
     """
 
     Args:
@@ -111,7 +117,11 @@ def _extrapolate_call_prices(
     upper_extrapolation = DataFrame(
         {"strike": p, "bid": 0, "ask": 0} for p in range(max_strike + 1, max_strike * 2)
     )
-    return concat([lower_extrapolation, options_data, upper_extrapolation]), min_strike, max_strike
+    return (
+        concat([lower_extrapolation, options_data, upper_extrapolation]),
+        min_strike,
+        max_strike,
+    )
 
 
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
@@ -157,7 +167,7 @@ def _calculate_IV(
 
 def _create_pdf_point_arrays(
     options_data: DataFrame, current_price: float, days_forward: int
-) -> Tuple[np.array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """Create two arrays containing x- and y-axis values representing a calculated
     price PDF
 
@@ -201,14 +211,16 @@ def _create_pdf_point_arrays(
     return (X_sparse, y[: len(X_sparse)])
 
 
-def _crop_pdf(pdf: Tuple[np.array], min_strike: float, max_strike: float) -> Tuple[np.array]:
+def _crop_pdf(
+    pdf: Tuple[np.ndarray, np.ndarray], min_strike: float, max_strike: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """Crop the PDF to the range of the original options data"""
     l, r = 0, len(pdf[0]) - 1
     while pdf[0][l] < min_strike:
         l += 1
     while pdf[0][r] > max_strike:
         r -= 1
-    return pdf[0][l:r + 1], pdf[1][l:r + 1]
+    return pdf[0][l : r + 1], pdf[1][l : r + 1]
 
 
 def _call_value(S, K, sigma, t=0, r=0):
