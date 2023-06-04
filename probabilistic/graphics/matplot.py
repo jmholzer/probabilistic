@@ -6,7 +6,7 @@ from labellines import labelLine
 from matplotlib import pyplot
 from matplotlib.figure import Figure
 from matplotlib.ticker import MultipleLocator
-from numpy import array, linspace
+from numpy import linspace, ndarray
 
 from probabilistic.core import calculate_quartiles
 
@@ -14,7 +14,7 @@ pyplot.rcParams["axes.autolimit_mode"] = "round_numbers"
 
 
 def generate_pdf_figure(
-    density_function: Tuple[array],
+    density_function: Tuple[ndarray],
     *,
     security_ticker: str,
     estimate_date: datetime,
@@ -28,7 +28,7 @@ def generate_pdf_figure(
     )
 
     # add axis titles
-    ax.set_xlabel(f"Price")
+    ax.set_xlabel("Price")
     ax.set_ylabel("Probability")
 
     # format x-axis
@@ -51,7 +51,7 @@ def generate_pdf_figure(
 
 
 def generate_cdf_figure(
-    density_function: Tuple[array],
+    density_function: Tuple[ndarray],
     *,
     security_ticker: str,
     estimate_date: datetime,
@@ -73,7 +73,7 @@ def generate_cdf_figure(
     )
 
     # add axis titles
-    ax.set_xlabel(f"Price")
+    ax.set_xlabel("Price")
     ax.set_ylabel("Probability")
 
     # format x-axis
