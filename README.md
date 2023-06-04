@@ -1,4 +1,7 @@
-# Probabilistic
+![Probabilistic logo](probabilistic/dashboard/resources/logo.png)
+
+![Python version](https://img.shields.io/badge/python-3.10-blue.svg)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
 
 This Python project generates future price probability density functions (PDFs), cumulative distribution functions (CDFs), and quartiles for publicly traded securities using options data. The output is visualized with matplotlib, and the project also includes a user-friendly web-based dashboard interface built with Streamlit.
 
@@ -8,7 +11,6 @@ This Python project generates future price probability density functions (PDFs),
 - [Usage](#usage)
 - [Algorithm Overview](#algorithm-overview)
 - [License](#license)
-- [Contact](#contact)
 
 ## Installation
 
