@@ -170,7 +170,7 @@ def _validate_estimate_date():
     return result
 
 
-def _calculate_days_in_future(input_date: datetime.date) -> int:
+def _calculate_days_in_future(input_date) -> int:
     return (input_date - datetime.today().date()).days
 
 
