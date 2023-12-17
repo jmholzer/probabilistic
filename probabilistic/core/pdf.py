@@ -32,7 +32,10 @@ def calculate_pdf(
     )
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
-    pdf = _create_pdf_point_arrays(options_data, current_price, days_forward)
+    options_data = _bspline_IV() # setting up skeleton function
+    # pdf = _create_pdf_point_arrays(options_data, current_price, days_forward)
+    first_deriv = _numerical_diff(options_data) # setting up skeleton function
+    pdf = _numerical_diff(first_deriv) # setting up skeleton function
     return _crop_pdf(pdf, min_strike, max_strike)
 
 
@@ -166,11 +169,13 @@ def _calculate_IV(
     options_data = options_data.dropna()
     return options_data
 
+"""
+I will replace this with simple numerical differentiation:
 
 def _create_pdf_point_arrays(
     options_data: DataFrame, current_price: float, days_forward: int
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Create two arrays containing x- and y-axis values representing a calculated
+    Create two arrays containing x- and y-axis values representing a calculated
     price PDF
 
     Args:
@@ -182,7 +187,7 @@ def _create_pdf_point_arrays(
 
     Returns:
         a tuple containing x-axis values (index 0) and y-axis values (index 1)
-    """
+    
     vol_surface = interp1d(
         options_data.strike, options_data.iv, kind="cubic", fill_value="extrapolate"
     )
@@ -211,7 +216,10 @@ def _create_pdf_point_arrays(
     )
 
     return (X_sparse, y[: len(X_sparse)])
+"""
 
+def _numerical_diff()
+    "Setting up skeleton function"
 
 def _crop_pdf(
     pdf: Tuple[np.ndarray, np.ndarray], min_strike: float, max_strike: float
