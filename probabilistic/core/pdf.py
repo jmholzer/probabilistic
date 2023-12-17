@@ -18,7 +18,7 @@ def calculate_pdf(
 
     Args:
         options_data: a DataFrame containing options price data with
-            cols ['strike', 'bid', 'ask']
+            cols ['strike', 'bid', 'ask', 'last price']
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
@@ -124,6 +124,8 @@ def _extrapolate_call_prices(
     )
 
 
+"Mid price should no longer be used as we will use 'last price' instead"
+"As a quick fix, I will replace 'mid_price' variable with 'last price'"
 def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
     """Calculate the mid-price of the options at each strike price.
 
@@ -134,7 +136,7 @@ def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
     Returns:
         the options_data DataFrame, with an additional column for mid-price
     """
-    options_data["mid_price"] = (options_data.bid + options_data.ask) / 2
+    options_data["mid_price"] = options_data["last price"]
     options_data = options_data[options_data.mid_price >= 0]
     return options_data
 
