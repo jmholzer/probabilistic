@@ -33,10 +33,8 @@ def calculate_pdf(
     )
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
-    denoised_iv = _fit_bspline_IV(options_data) # setting up skeleton function
-    # pdf = _create_pdf_point_arrays(options_data, current_price, days_forward) # will no longer use this function; use numerical differentiation instead
-    first_deriv = _numerical_diff(denoised_iv) # setting up skeleton function
-    pdf = _numerical_diff(first_deriv) # setting up skeleton function
+    denoised_iv = _fit_bspline_IV(options_data)
+    pdf = _create_pdf_point_arrays(denoised_iv, current_price, days_forward)
     return _crop_pdf(pdf, min_strike, max_strike)
 
 
@@ -256,11 +254,33 @@ def _create_pdf_point_arrays(
     return (X_sparse, y[: len(X_sparse)])
 """
 
-def _numerical_diff()
-    """
+def _create_pdf_point_arrays(
+    denoised_iv: tuple, current_price: float, days_forward: int
+) -> Tuple[np.ndarray, np.ndarray]:
     Create two arrays containing x- and y-axis values representing a calculated
     price PDF
-    """
+
+    Args:
+        denoised_iv: (x,y) observations of the denoised IV
+        current_price: the current price of the security
+        days_forward: the number of days in the future to estimate the
+            price probability density at
+
+    Returns:
+        a tuple containing x-axis values (index 0) and y-axis values (index 1)
+
+    # extract the x and y vectors from the denoised IV observations
+    x_IV = denoised_iv[0]
+    y_IV = denoised_IV[1]
+
+    # convert IV-space to price-space
+    # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
+    years_forward = days_forward / 365
+    interpolated = _call_value(current_price, x_IV, y_IV, years_forward)
+    first_derivative_discrete = np.gradient(interpolated, x_IV)
+    second_derivative_discrete = np.gradient(first_derivative_discrete, x_IV)
+
+    return(x_IV, second_derivative_discrete)
 
 
 def _crop_pdf(
