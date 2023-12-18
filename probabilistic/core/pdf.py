@@ -3,6 +3,7 @@ from typing import Dict, Tuple
 import numpy as np
 from pandas import concat, DataFrame
 from scipy.integrate import simps
+from scipy import interpolate
 from scipy.interpolate import interp1d
 from scipy.optimize import brentq
 from scipy.stats import norm
@@ -32,9 +33,9 @@ def calculate_pdf(
     )
     options_data = _calculate_mid_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
-    options_data = _bspline_IV() # setting up skeleton function
-    # pdf = _create_pdf_point_arrays(options_data, current_price, days_forward)
-    first_deriv = _numerical_diff(options_data) # setting up skeleton function
+    denoised_iv = _fit_bspline_IV(options_data) # setting up skeleton function
+    # pdf = _create_pdf_point_arrays(options_data, current_price, days_forward) # will no longer use this function; use numerical differentiation instead
+    first_deriv = _numerical_diff(denoised_iv) # setting up skeleton function
     pdf = _numerical_diff(first_deriv) # setting up skeleton function
     return _crop_pdf(pdf, min_strike, max_strike)
 
@@ -169,6 +170,41 @@ def _calculate_IV(
     options_data = options_data.dropna()
     return options_data
 
+def _fit_bspline_IV(
+    options_data: DataFrame
+) -> DataFrame:
+    """Fit a bspline function on the IV observations, in effect denoising the IV
+
+    Args:
+        options_data: a DataFrame containing options price data with
+            cols ['strike', 'bid', 'ask', 'mid_price', 'iv']
+
+    Returns:
+        a tuple containing x-axis values (index 0) and y-axis values (index 1)
+        'x' represents the price
+        'y' represents the value of the IV
+    """
+    x = options_data['strike']
+    y = options_data['iv']
+
+    # fit the bspline using scipy.interpolate.splrep, with k=3
+    """
+    Bspline Parameters:
+        t = the vector of knots
+        c = the B-spline coefficients
+        k = the degree of the spline
+    """
+    tck = interpolate.splrep(x, y, s=10, k=3)
+
+    dx = 0.1 # setting dx = 0.1 for numerical differentiation
+    domain = int((max(x)-min(x))/dx)
+
+    # compute (x,y) observations of the denoised IV from the fitted IV function
+    x_new = np.linspace(min(x), max(x), domain)
+    y_fit = interpolate.BSpline(*tck)(x_new)
+
+    return(x_new, y_fit)
+
 """
 I will replace this with simple numerical differentiation:
 
@@ -220,6 +256,7 @@ def _create_pdf_point_arrays(
 
 def _numerical_diff()
     "Setting up skeleton function"
+
 
 def _crop_pdf(
     pdf: Tuple[np.ndarray, np.ndarray], min_strike: float, max_strike: float
