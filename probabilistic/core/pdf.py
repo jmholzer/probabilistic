@@ -173,7 +173,9 @@ def _calculate_IV(
 def _fit_bspline_IV(
     options_data: DataFrame
 ) -> DataFrame:
-    """Fit a bspline function on the IV observations, in effect denoising the IV
+    """Fit a bspline function on the IV observations, in effect denoising the IV.
+        From this smoothed IV function, generate (x,y) coordinates
+        representing observations of the denoised IV
 
     Args:
         options_data: a DataFrame containing options price data with
@@ -255,7 +257,10 @@ def _create_pdf_point_arrays(
 """
 
 def _numerical_diff()
-    "Setting up skeleton function"
+    """
+    Create two arrays containing x- and y-axis values representing a calculated
+    price PDF
+    """
 
 
 def _crop_pdf(
