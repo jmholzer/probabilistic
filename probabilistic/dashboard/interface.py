@@ -136,7 +136,7 @@ def _validate_calls():
         else False
     """
     calls = st.session_state["calls"]
-    result = calls.size > 0 and set(calls.columns) == {"strike", "bid", "ask"}
+    result = calls.size > 0 and set(calls.columns) == {"strike", "bid", "ask", "last_price"}
     if not result:
         st.warning("Call options data must be in the specified form")
     return result
