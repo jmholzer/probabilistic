@@ -17,14 +17,14 @@ def generate_pdf_figure(
     density_function: Tuple[ndarray],
     *,
     security_ticker: str,
-    estimate_date: datetime,
+    expiry_date: datetime,
     current_price: Optional[Union[float, bool]] = False,
 ) -> Figure:
     fig, ax = pyplot.subplots()
     ax.plot(density_function[0], density_function[1])
     ax.set_title(
         f"Probability Density Function of the price of"
-        f"\n{security_ticker} on {estimate_date}"
+        f"\n{security_ticker} on {expiry_date}"
     )
 
     # add axis titles
@@ -54,7 +54,7 @@ def generate_cdf_figure(
     density_function: Tuple[ndarray],
     *,
     security_ticker: str,
-    estimate_date: datetime,
+    expiry_date: datetime,
     current_price: Optional[Union[float, bool]] = False,
     quartiles: Optional[bool] = False,
 ) -> Figure:
@@ -69,7 +69,7 @@ def generate_cdf_figure(
     ax.plot(density_function[0], density_function[1])
     ax.set_title(
         f"Cumulative Density Function of the price of"
-        f"\n{security_ticker} on {estimate_date}"
+        f"\n{security_ticker} on {expiry_date}"
     )
 
     # add axis titles
