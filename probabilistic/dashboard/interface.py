@@ -34,7 +34,7 @@ def generate_body() -> None:
 def generate_input_section() -> None:
     """Generate content for the input section."""
     st.text_input(label="Security ticker symbol", key="security_ticker")
-    c1, c2 = st.columns(2)
+    c1, c2, c3 = st.columns(3)
     with c1:
         st.number_input(
             label="Current price",
@@ -42,9 +42,11 @@ def generate_input_section() -> None:
             key="current_price",
         )
     with c2:
+        st.date_input(label="Current date", key="current_date")
+    with c3:
         st.date_input(label="Option expires on", key="expiry_date")
 
-    st.session_state["calls"] = pd.DataFrame({"strike": [], "bid": [], "ask": []})
+    st.session_state["calls"] = pd.DataFrame({"strike": [], "bid": [], "ask": [], "last_price": []})
     uploaded_file = st.file_uploader("Call options data", key="1")
 
     container = st.empty()
@@ -66,7 +68,7 @@ def generate_results() -> None:
 
     reader = CSVReader()
     options_data = reader.read(st.session_state["calls"])
-    days_forward = _calculate_days_in_future(st.session_state["expiry_date"])
+    days_forward = _calculate_days_in_future(st.session_state["expiry_date"], st.session_state["current_date"])
 
     with st.spinner(text="Calculating..."):
         pdf = calculate_pdf(
@@ -155,7 +157,6 @@ def _validate_current_price():
         st.warning("Current price must be greater than 0")
     return result
 
-
 def _validate_expiry_date():
     """Inspects the app's session_state to check if the user's estimate date input
     is valid
@@ -164,14 +165,14 @@ def _validate_expiry_date():
         True if the current state of the user's estimate date input is valid,
         else False
     """
-    result = _calculate_days_in_future(st.session_state["expiry_date"]) >= 1
+    result = _calculate_days_in_future(st.session_state["expiry_date"], st.session_state["current_date"]) >= 1
     if not result:
-        st.warning("Estimate date must be at least one day in the future")
+        st.warning("Expiry date must be at least one day in the future")
     return result
 
 
-def _calculate_days_in_future(input_date) -> int:
-    return (input_date - datetime.today().date()).days
+def _calculate_days_in_future(future_date, curr_date) -> int:
+    return (future_date - curr_date).days
 
 
 def _set_page_upper_margin():
