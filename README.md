@@ -3,7 +3,7 @@
 ![Python version](https://img.shields.io/badge/python-3.10-blue.svg)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
 
-This Python project generates future price probability density functions (PDFs), cumulative distribution functions (CDFs), and quartiles for publicly traded securities using options data. The output is visualized with matplotlib, and the project also includes a user-friendly web-based dashboard interface built with Streamlit.
+This Python project generates future-looking probability density function (PDFs) and cumulative distribution functions (CDFs) for the prices of publicly traded securities using options data. The output is visualized with matplotlib, and the project also includes a user-friendly web-based dashboard interface built with Streamlit.
 
 ## Table of Contents
 
@@ -50,20 +50,19 @@ probabilistic
 
 This will start a local web server and you should be able to access the dashboard in your web browser at `localhost:8501`.
 
-The user will need to provide their own options data in a CSV file with the headers 'strike', 'bid', and 'ask'. Sample data for SPY can be found in the `data` folder.
+The user will need to provide their own options data in a CSV file with the columns 'strike' and 'last_price'. Sample data for SPY can be found in the `data` folder.
 
 ## Algorithm Overview
 
-The process of generating the PDFs, CDFs, and quartiles is as follows:
+The process of generating the PDFs and CDFs is as follows:
 
 1. Options data is read from a CSV file to create a DataFrame.
-2. The mid-price of each option is calculated, which is simply the average of the bid and ask prices.
 3. The implied volatility (IV) of each option is then computed using the Black-Scholes formula. The IV is a measure of how much the market expects the price of the asset to move in the future.
 4. Two arrays of x-values (prices) and y-values (densities) are produced, representing the PDF of the future price of the asset.
 5. The cumulative probability at each price is calculated, resulting in the CDF.
 6. Quartiles (25th, 50th, and 75th percentiles) of the price distribution are derived.
 
-This tool can provide insights into market expectations for the future price of an asset based on current options prices. For instance, if you want to anticipate the likely price of a stock 30 days from now, you could use this tool to calculate the PDF and CDF from the stock's current options data, and inspect the distribution quartiles to understand the range of probable prices.
+This tool can provide insights into market expectations for the future price of an asset based on current options prices. For instance, if you want to anticipate the likely price of a stock 30 days from now, you could use this tool to calculate the PDF and CDF from the stock's current options data, and inspect the distribution to understand the range of probable prices.
 
 ## Examples
 
