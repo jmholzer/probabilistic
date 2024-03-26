@@ -54,7 +54,7 @@ The user will need to provide their own options data in a CSV file with the colu
 
 ## Theory Overview
 
-An option is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an asset at a specified price (strike price) on or before a certain date. Intuitively, the value of an option depends on the probability that it will be profitable or "in-the-money" at expiration. 
+An option is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an asset at a specified price (strike price) on a certain date in the future. Intuitively, the value of an option depends on the probability that it will be profitable or "in-the-money" at expiration. 
 
 Why? Imagine if you had the right to sell a stock at $100 tomorrow, and it's currently trading at $10 at market close. This option sounds valuable, because the probability that you will be able to exercise it is high. But if you knew that the stock will jump to $200 at market open, then the probability of you being able to exercise that option is actually 0%, and thus the option is worthless. 
 
