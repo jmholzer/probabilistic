@@ -52,17 +52,34 @@ This will start a local web server and you should be able to access the dashboar
 
 The user will need to provide their own options data in a CSV file with the columns 'strike' and 'last_price'. Sample data for SPY can be found in the `data` folder.
 
+## Theory Overview
+
+An option is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an asset at a specified price (strike price) on or before a certain date. Intuitively, the value of an option depends on the probability that it will be profitable or "in-the-money" at expiration. 
+
+Why? Imagine if you had the right to sell a stock at $100 tomorrow, and it's currently trading at $10 at market close. This option sounds valuable, because the probability that you will be able to exercise it is high. But if you knew that the stock will jump to $200 at market open, then the probability of you being able to exercise that option is actually 0%, and thus the option is worthless. 
+
+So the price of an option reflects the market's collective expectation about the future price of the underlying asset, and is inherently tied to the probability of its outcome (the option being in-the-money) occuring. 
+Thus, we can work backwards, solving for the probability of outcomes occuring along a continuum of strike prices, and thus generating a PDF of the market's collective expectation of the future price of the underlying asset. 
+
+For a simplified worked example, see this [excellent blog post](https://reasonabledeviations.com/2020/10/10/option-implied-pdfs-2/).
+For a complete reading of the academic theory, see [this paper](https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870).
+
 ## Algorithm Overview
 
 The process of generating the PDFs and CDFs is as follows:
 
-1. Options data is read from a CSV file to create a DataFrame.
-3. The implied volatility (IV) of each option is then computed using the Black-Scholes formula. The IV is a measure of how much the market expects the price of the asset to move in the future.
-4. Two arrays of x-values (prices) and y-values (densities) are produced, representing the PDF of the future price of the asset.
-5. The cumulative probability at each price is calculated, resulting in the CDF.
-6. Quartiles (25th, 50th, and 75th percentiles) of the price distribution are derived.
+1. For an underlying asset, options data along the full range of strike prices are read from a CSV file to create a DataFrame. This gives us a table of strike prices along with the last price[^1] each option sold for
+2. Using the Black-Sholes formula, we convert strike prices into implied volatilities (IV)[^2]
+3. Using B-spline, we fit a curve-of-best-fit onto the discrete observations of IV over a range of strike prices[^3]. Thus, we have extracted a continuous model from discrete IV observations - this is called the volatility smile
+4. From the volatility smile, we use Black-Scholes to convert IVs back to prices. Thus, we arrive at a continuous curve of options prices along the full range of strike prices
+5. From the continuous price curve, we use numerical differentiation to get the first derivative of prices. Then we numerically differentiate again to get the second derivative of prices. The second derivative of prices is the probability density function [^4]
+6. Once we have the PDF, we can calculate the CDF
+7. Quartiles (25th, 50th, and 75th percentiles) of each distribution are also derived
 
-This tool can provide insights into market expectations for the future price of an asset based on current options prices. For instance, if you want to anticipate the likely price of a stock 30 days from now, you could use this tool to calculate the PDF and CDF from the stock's current options data, and inspect the distribution to understand the range of probable prices.
+[^1] We chose to use last price instead of calculating the mid-price of the bid-ask spread. This is because Yahoo Finance, a common source for options chain data, often lacks bid-ask data. See for example [Apple options](https://finance.yahoo.com/quote/AAPL/options/)
+[^2] We convert from price-space to IV-space, and then back to price-space as described in step 4. See this [excellent blog post](https://reasonabledeviations.com/2020/10/10/option-implied-pdfs-2/) for a breakdown of why we do this double conversion
+[^3] See [this paper](https://edoc.hu-berlin.de/bitstream/handle/18452/14708/zeng.pdf?sequence=1&isAllowed=y) for more details. In summary, options markets contains noise. Therefore, generating a volatility smile through simple interpolation will result in a noisy and not well behaved smile function. Then converting back to price-space will result in a noisy price-curve. And finally when we numerically twice differentiate the price-curve, noise will be amplified and the resulting PDF will be meaningless. Thus, we need a statistical or machine learning model to try to extract the true relationship between IV-strike price given the noisy observations. The paper suggests a 3rd order B-spline as an optimal model
+[^4] For a proof that the 2nd derivative of options price with respect to strike price is the PDF, see again this [excellent blog post](https://reasonabledeviations.com/2020/10/10/option-implied-pdfs-2/)
 
 ## Examples
 
