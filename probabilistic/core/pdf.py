@@ -202,7 +202,7 @@ def _fit_bspline_IV(
     return(x_new, y_fit)
 
 def _create_pdf_point_arrays(
-    denoised_iv: tuple, current_price: float, days_forward: int
+    denoised_iv: tuple, current_price: float, days_forward: int, rf = 0.01
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Create two arrays containing x- and y-axis values representing a calculated
     price PDF
@@ -212,6 +212,7 @@ def _create_pdf_point_arrays(
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
+        rf: the current risk free interest rate
 
     Returns:
         a tuple containing x-axis values (index 0) and y-axis values (index 1)
@@ -228,7 +229,10 @@ def _create_pdf_point_arrays(
     first_derivative_discrete = np.gradient(interpolated, x_IV)
     second_derivative_discrete = np.gradient(first_derivative_discrete, x_IV)
 
-    return(x_IV, second_derivative_discrete)
+    # apply coefficient to reflect the time value of money
+    pdf = np.exp(rf * years_forward) * second_derivative_discrete 
+
+    return(x_IV, pdf)
 
 
 def _crop_pdf(
