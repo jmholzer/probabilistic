@@ -7,7 +7,7 @@ name = "probabilistic"
 version = "0.0.0"
 authors = [
   { name="Jannic Holzer", email="jannic.holzer@gmail.com" },
-  { name-"Henry Tian", email="tyrneh@gmail.com" }
+  { name="Henry Tian", email="tyrneh@gmail.com" },
 ]
 description = "Generate future price PDFs for publicly traded securities using options data"
 requires-python = ">=3.10"
