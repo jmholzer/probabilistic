@@ -35,7 +35,6 @@ pandas==1.5.1
 Pillow==9.3.0
 pluggy==1.0.0
 polygon-api-client==1.4.0
--e git+ssh://git@github.com/jmholzer/probabilistic-pdfs.git@6fab14cccf86caeea1386904746a93aaaeea3133#egg=probabilistic
 protobuf==3.20.3
 pyarrow==10.0.1
 pydeck==0.8.0

@@ -3,11 +3,10 @@ from typing import Dict, Tuple
 import numpy as np
 from pandas import concat, DataFrame
 from scipy.integrate import simps
+from scipy import interpolate
 from scipy.interpolate import interp1d
 from scipy.optimize import brentq
 from scipy.stats import norm
-
-from probabilistic.core.tvr import DiffTVR
 
 
 def calculate_pdf(
@@ -18,7 +17,7 @@ def calculate_pdf(
 
     Args:
         options_data: a DataFrame containing options price data with
-            cols ['strike', 'bid', 'ask']
+            cols ['strike', 'bid', 'ask', 'last_price']
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
@@ -30,9 +29,10 @@ def calculate_pdf(
     options_data, min_strike, max_strike = _extrapolate_call_prices(
         options_data, current_price
     )
-    options_data = _calculate_mid_price(options_data)
+    options_data = _calculate_last_price(options_data)
     options_data = _calculate_IV(options_data, current_price, days_forward)
-    pdf = _create_pdf_point_arrays(options_data, current_price, days_forward)
+    denoised_iv = _fit_bspline_IV(options_data)
+    pdf = _create_pdf_point_arrays(denoised_iv, current_price, days_forward)
     return _crop_pdf(pdf, min_strike, max_strike)
 
 
@@ -92,7 +92,7 @@ def calculate_quartiles(
         0.75: brentq(lambda x: cdf_interpolated(x) - 0.75, x_start, x_end),
     }
 
-
+# why did you extrapolate call prices?
 def _extrapolate_call_prices(
     options_data: DataFrame, current_price: float
 ) -> DataFrame:
@@ -102,7 +102,7 @@ def _extrapolate_call_prices(
 
     Args:
         options_data: a DataFrame containing options price data with
-            cols ['strike', 'bid', 'ask']
+            cols ['strike', 'bid', 'ask', 'last_price']
         current_price: the current price of the security
 
     Returns:
@@ -124,18 +124,18 @@ def _extrapolate_call_prices(
     )
 
 
-def _calculate_mid_price(options_data: DataFrame) -> DataFrame:
-    """Calculate the mid-price of the options at each strike price.
+def _calculate_last_price(options_data: DataFrame) -> DataFrame:
+    """Take the last-price of the options at each strike price.
 
     Args:
         options_data: a DataFrame containing options price data with
-            cols ['strike', 'bid', 'ask']
+            cols ['strike', 'bid', 'ask', 'last_price']
 
     Returns:
         the options_data DataFrame, with an additional column for mid-price
     """
-    options_data["mid_price"] = (options_data.bid + options_data.ask) / 2
-    options_data = options_data[options_data.mid_price >= 0]
+    options_data["last_price"] = options_data["last_price"]
+    options_data = options_data[options_data.last_price >= 0]
     return options_data
 
 
@@ -146,7 +146,7 @@ def _calculate_IV(
 
     Args:
         options_data: a DataFrame containing options price data with
-            cols ['strike', 'bid', 'ask', 'mid_price']
+            cols ['strike', 'bid', 'ask', 'last_price']
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
@@ -157,58 +157,82 @@ def _calculate_IV(
     years_forward = days_forward / 365
     options_data["iv"] = options_data.apply(
         lambda row: _bs_iv(
-            row.mid_price, current_price, row.strike, years_forward, max_iter=500
+            row.last_price, current_price, row.strike, years_forward, max_iter=500
         ),
         axis=1,
     )
     options_data = options_data.dropna()
     return options_data
 
+def _fit_bspline_IV(
+    options_data: DataFrame
+) -> DataFrame:
+    """Fit a bspline function on the IV observations, in effect denoising the IV.
+        From this smoothed IV function, generate (x,y) coordinates
+        representing observations of the denoised IV
+
+    Args:
+        options_data: a DataFrame containing options price data with
+            cols ['strike', 'bid', 'ask', 'last_price', 'iv']
+
+    Returns:
+        a tuple containing x-axis values (index 0) and y-axis values (index 1)
+        'x' represents the price
+        'y' represents the value of the IV
+    """
+    x = options_data['strike']
+    y = options_data['iv']
+
+    # fit the bspline using scipy.interpolate.splrep, with k=3
+    """
+    Bspline Parameters:
+        t = the vector of knots
+        c = the B-spline coefficients
+        k = the degree of the spline
+    """
+    tck = interpolate.splrep(x, y, s=10, k=3)
+
+    dx = 0.1 # setting dx = 0.1 for numerical differentiation
+    domain = int((max(x)-min(x))/dx)
+
+    # compute (x,y) observations of the denoised IV from the fitted IV function
+    x_new = np.linspace(min(x), max(x), domain)
+    y_fit = interpolate.BSpline(*tck)(x_new)
+
+    return(x_new, y_fit)
 
 def _create_pdf_point_arrays(
-    options_data: DataFrame, current_price: float, days_forward: int
+    denoised_iv: tuple, current_price: float, days_forward: int, rf = 0.01
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Create two arrays containing x- and y-axis values representing a calculated
     price PDF
 
     Args:
-        options_data: a DataFrame containing options price data with
-            cols ['strike', 'bid', 'ask', 'iv']
+        denoised_iv: (x,y) observations of the denoised IV
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
+        rf: the current risk free interest rate
 
     Returns:
         a tuple containing x-axis values (index 0) and y-axis values (index 1)
     """
-    vol_surface = interp1d(
-        options_data.strike, options_data.iv, kind="cubic", fill_value="extrapolate"
-    )
-    dx = 0.05  # setting dx = 0.05 for the numerical differentiation of 1st derivative
-    X = np.arange(options_data.strike.min(), options_data.strike.max(), dx)
 
+    # extract the x and y vectors from the denoised IV observations
+    x_IV = denoised_iv[0]
+    y_IV = denoised_iv[1]
+
+    # convert IV-space to price-space
     # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
     years_forward = days_forward / 365
-    interpolated = _call_value(current_price, X, vol_surface(X), years_forward)
-    first_derivative_discrete = np.gradient(interpolated, X)
+    interpolated = _call_value(current_price, x_IV, y_IV, years_forward)
+    first_derivative_discrete = np.gradient(interpolated, x_IV)
+    second_derivative_discrete = np.gradient(first_derivative_discrete, x_IV)
 
-    # to speed up TVR, we increase dx and therefore reduce n
-    X_sparse = X[0::10]  # array navigation: start at 0, go to end, every 10 values
-    n_sparse = len(X_sparse)
-    first_derivative_sparse = first_derivative_discrete[
-        0::10
-    ]  # start at 0, go to end, every 10 values
+    # apply coefficient to reflect the time value of money
+    pdf = np.exp(rf * years_forward) * second_derivative_discrete 
 
-    # calculate second derivative of the call options prices using TVR
-    diff_tvr = DiffTVR(n_sparse, dx * 10)
-    (y, _) = diff_tvr.get_deriv_tvr(
-        data=first_derivative_sparse,
-        deriv_guess=np.full(n_sparse + 1, 0.0),
-        alpha=10,
-        no_opt_steps=10,
-    )
-
-    return (X_sparse, y[: len(X_sparse)])
+    return(x_IV, pdf)
 
 
 def _crop_pdf(
