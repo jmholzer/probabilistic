@@ -83,7 +83,7 @@ The process of generating the PDFs and CDFs is as follows:
 
 ## Examples
 
-An example of the input and output for the sample SPY options chain data for the date of 30/06/23 (taken on 04/06/23)  included in `data/` is:
+An example of the input and output for the sample AAPL options chain data for the expiry date of Mar 15 2024 (taken on Nov 14 2023)  included in `data/` is:
 
 ![Probabilistic example input](.meta/images/probabilistic_example_input.png)
 
