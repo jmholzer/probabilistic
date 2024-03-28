@@ -72,7 +72,7 @@ The process of generating the PDFs and CDFs is as follows:
 2. Using the Black-Sholes formula, we convert strike prices into implied volatilities (IV)[^2]
 3. Using B-spline, we fit a curve-of-best-fit onto the discrete observations of IV over a range of strike prices[^3]. Thus, we have extracted a continuous model from discrete IV observations - this is called the volatility smile
 4. From the volatility smile, we use Black-Scholes to convert IVs back to prices. Thus, we arrive at a continuous curve of options prices along the full range of strike prices
-5. From the continuous price curve, we use numerical differentiation to get the first derivative of prices. Then we numerically differentiate again to get the second derivative of prices. The second derivative of prices is the probability density function [^4]
+5. From the continuous price curve, we use numerical differentiation to get the first derivative of prices. Then we numerically differentiate again to get the second derivative of prices. The second derivative of prices multiplied by a discount factor @\exp^{r*\uptau}, results in the probability density function [^4]
 6. Once we have the PDF, we can calculate the CDF
 7. Quartiles (25th, 50th, and 75th percentiles) of each distribution are also derived
 
