@@ -1,8 +1,6 @@
 from pathlib import Path
-
 import numpy as np
 import pytest
-
 from probabilistic.io import CSVReader
 
 
@@ -13,7 +11,7 @@ def sample_url():
 
 
 class TestCSVReader:
-    """Test the implemetation of CSVReader"""
+    """Test the implementation of CSVReader"""
 
     def test_read_sample_file(self, sample_url):
         """Test that CSVReader reads a sample file correctly"""
@@ -21,4 +19,4 @@ class TestCSVReader:
         result = reader.read(sample_url)
         assert result["strike"][2] == 325
         assert len(result) == 78
-        assert isinstance(result["last_price"][0], np.float64)
+        assert isinstance(result["last_price"][0], np.floating)
