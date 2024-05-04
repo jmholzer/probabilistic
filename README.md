@@ -50,16 +50,16 @@ probabilistic
 
 This will start a local web server and you should be able to access the dashboard in your web browser at `localhost:8501`.
 
-The user will need to provide their own options data in a CSV file with the columns 'strike', 'bid', 'ask', and 'last_price'. Sample data for SPY can be found in the `data` folder.
+The user will need to provide their own options data in a CSV file with the columns 'strike', and 'last_price'. Sample data for SPY can be found in the `data` folder.
 
 ## Theory Overview
 
-An option is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an asset at a specified price (strike price) on a certain date in the future. Intuitively, the value of an option depends on the probability that it will be profitable or "in-the-money" at expiration. 
+An option is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an asset at a specified price (strike price) on a certain date in the future. Intuitively, the value of an option depends on the probability that it will be profitable or "in-the-money" at expiration.
 
-Why? Consider this scenario: You possess an option to sell a stock for $100 tomorrow, and as of the market's close today, the stock's price stands at $10. Intuitively, this option appears to hold significant value due to the high likelihood of its exercise. However, if it were certain that the stock's price would surge to $200 at the opening bell tomorrow, the chance of exercising your option profitably drops to zero. Consequently, the option's value evaporates. This illustrates how the price of an option is linked to the probability of its being in the money—that is, the likelihood that the option can be exercised at a profit. Consequently, by knowing the price of an option, we can work backwards to calculate the consensus probability of its future price. 
+Why? Consider this scenario: You possess an option to sell a stock for $100 tomorrow, and as of the market's close today, the stock's price stands at $10. Intuitively, this option appears to hold significant value due to the high likelihood of its exercise. However, if it were certain that the stock's price would surge to $200 at the opening bell tomorrow, the chance of exercising your option profitably drops to zero. Consequently, the option's value evaporates. This illustrates how the price of an option is linked to the probability of its being in the money—that is, the likelihood that the option can be exercised at a profit. Consequently, by knowing the price of an option, we can work backwards to calculate the consensus probability of its future price.
 
-To recap, the price of an option reflects the market's collective expectation about the future price of the underlying asset, and is inherently tied to the probability of its outcome (the option being in-the-money) occuring. 
-By working backwards, we can solve for the probability of outcomes occuring along a continuum of strike prices, and thus generate a PDF of the market's collective expectation of the future price of the underlying asset. 
+To recap, the price of an option reflects the market's collective expectation about the future price of the underlying asset, and is inherently tied to the probability of its outcome (the option being in-the-money) occuring.
+By working backwards, we can solve for the probability of outcomes occuring along a continuum of strike prices, and thus generate a PDF of the market's collective expectation of the future price of the underlying asset.
 
 For a simplified worked example, see this [excellent blog post](https://reasonabledeviations.com/2020/10/10/option-implied-pdfs-2/).
 For a complete reading of the financial theory, see [this paper](https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870).
