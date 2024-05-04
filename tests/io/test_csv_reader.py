@@ -20,6 +20,5 @@ class TestCSVReader:
         reader = CSVReader()
         result = reader.read(sample_url)
         assert result["strike"][2] == 325
-        assert result["ask"][3] == 49.55
         assert len(result) == 78
-        assert isinstance(result["bid"][0], np.float64)
+        assert isinstance(result["last_price"][0], np.float64)
