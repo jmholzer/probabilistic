@@ -1,0 +1,7 @@
+include *.py
+recursive-include cli *
+recursive-include core *
+recursive-include dashboard *
+recursive-include dashboard/resources *.png
+recursive-include graphics *
+recursive-include io *
