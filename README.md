@@ -42,7 +42,7 @@ Please note that this project requires Python 3.10 or later.
 
 ## Usage
 
-To start the web-based dashboard, run the following command:
+<b>Option 1: To start the web-based dashboard, run the following command:</b>
 
 ```bash
 probabilistic
@@ -51,6 +51,26 @@ probabilistic
 This will start a local web server and you should be able to access the dashboard in your web browser at `localhost:8501`.
 
 The user will need to provide their own options data in a CSV file with the columns 'strike', and 'last_price'. Sample data for SPY can be found in the `data` folder.
+
+<b>Option 2: To use probabilistic from within python, see `example_script.py` for a demo:</b>
+
+The user will need to specify 4 arguments:
+1. `input_csv_path`: a string containing the file path of the options data in a csv, with the columns 'strike' and 'last_price'
+2. `current_price`: a number of the underlying asset's current price
+3. `days_foward`: a number of the days between the current date and the strike date
+4. `output_csv_path`, a string containing the file path where the user wishes to save the results
+The output will be a csv file containing 3 columns: price, probability density, cumulative probability
+
+```
+from probabilistic import cli
+
+input_csv_path = "data/AAPL_currentdateNov14_callMar15_currentprice18480_CLEAN.csv"
+current_price = 184.8
+days_forward = 123
+output_csv_path = "/Users/username/Downloads/results.csv"
+
+cli.csv_runner.run(input_csv_path, float(current_price), int(days_forward), output_csv_path)
+```
 
 ## Theory Overview
 
