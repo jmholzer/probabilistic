@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# data files 
+*.xlsx
+*.csv
+
 # C extensions
 *.so
 
@@ -132,3 +136,4 @@ dmypy.json
 **/.idea/
 
 .DS_Store
+

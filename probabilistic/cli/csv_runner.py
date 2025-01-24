@@ -1,9 +1,11 @@
 from probabilistic.core import calculate_pdf, calculate_cdf
 from probabilistic.io import CSVReader
 import pandas as pd
+from traitlets import Bool
+from typing import Optional
 
 
-def run(input_csv_path: str, current_price: float, days_forward: int, output_csv_path: str) -> None:
+def run(input_csv_path: str, current_price: float, days_forward: int, save_to_csv: Bool, output_csv_path: Optional[str] = None) -> None:
     """Run probabilistic using the data from a CSV file as input
 
     Args:
@@ -11,6 +13,7 @@ def run(input_csv_path: str, current_price: float, days_forward: int, output_csv
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
+        save_to_csv: whether to save result as a csv. If False, then function will return a DataFrame
         output_csv_path: the path to save the output csv results 
 
     Returns:
@@ -32,4 +35,7 @@ def run(input_csv_path: str, current_price: float, days_forward: int, output_csv
     })
 
     # Write the DataFrame to a CSV file
-    df.to_csv(output_csv_path, index=False)
+    if save_to_csv:
+        df.to_csv(output_csv_path, index=False)
+    else:
+        return df
