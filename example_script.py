@@ -18,7 +18,7 @@ df = cli.csv_runner.run(
     input_csv_path=input_csv_path,
     current_price=float(current_price),
     days_forward=int(days_difference),
-    fit_kernel_pdf=False,
+    fit_kernel_pdf=True,
 )
 
 # Plot probability density function

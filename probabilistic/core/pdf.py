@@ -191,7 +191,10 @@ def _calculate_IV(
     years_forward = days_forward / 365
     options_data["iv"] = options_data.apply(
         lambda row: _bs_iv(
-            row.last_price, current_price, row.strike, years_forward, max_iter=1000
+            row.last_price,
+            current_price,
+            row.strike,
+            years_forward,
         ),
         axis=1,
     )
@@ -281,29 +284,66 @@ def _crop_pdf(
     return pdf[0][l : r + 1], pdf[1][l : r + 1]
 
 
-def _bs_iv(
-    price,
-    S,
-    K,
-    t=0,
-    r=0,
-    precision=1e-4,
-    initial_guess=0.2,
-    max_iter=1000,
-    verbose=False,
-):
-    # TODO: refactor this function (style)
-    iv = initial_guess
-    for _ in range(max_iter):
-        P = _call_value(S, K, iv, t, r)
-        diff = price - P
-        if abs(diff) < precision:
-            return iv
-        grad = _call_vega(S, K, iv, t, r)
-        iv += diff / grad
-    if verbose:
-        print(f"Did not converge after {max_iter} iterations")
-    return iv
+# def _bs_iv(
+#     price,
+#     S,
+#     K,
+#     t=0,
+#     r=0,
+#     precision=1e-4,
+#     initial_guess=0.2,
+#     max_iter=1000,
+#     verbose=False,
+# ):
+#     # TODO: refactor this function (style)
+#     iv = initial_guess
+#     for _ in range(max_iter):
+#         P = _call_value(S, K, iv, t, r)
+#         diff = price - P
+#         if abs(diff) < precision:
+#             return iv
+#         grad = _call_vega(S, K, iv, t, r)
+#         iv += diff / grad
+#     if verbose:
+#         print(f"Did not converge after {max_iter} iterations")
+#     return iv
+
+
+def _bs_iv(price, S, K, t, r=0):
+    """
+    Computes the implied volatility (IV) of a European call option using Brent’s method.
+
+    This function finds the implied volatility by solving for sigma (volatility) in the
+    Black-Scholes pricing formula. It uses Brent’s root-finding algorithm to find the
+    volatility that equates the Black-Scholes model price to the observed market price.
+
+    Args:
+        price (float): The observed market price of the option.
+        S (float): The current price of the underlying asset.
+        K (float): The strike price of the option.
+        t (float): Time to expiration in years.
+        r (float, optional): The risk-free interest rate (annualized). Defaults to 0.
+
+    Returns:
+        float: The implied volatility (IV) if a solution is found.
+        np.nan: If the function fails to converge to a solution.
+
+    Raises:
+        ValueError: If Brent’s method fails to find a root in the given range.
+
+    Notes:
+        - The function searches for IV within the range [1e-6, 5.0] (0.0001% to 500% volatility).
+        - If `t <= 0`, the function returns NaN since volatility is undefined for expired options.
+        - If the function fails to converge, it returns NaN instead of raising an exception.
+    """
+
+    if t <= 0:
+        return np.nan  # No volatility if time is zero or negative
+
+    try:
+        return brentq(lambda iv: _call_value(S, K, iv, t, r) - price, 1e-6, 5.0)
+    except ValueError:
+        return np.nan  # Return NaN if no solution is found
 
 
 def _call_value(S, K, sigma, t=0, r=0):
