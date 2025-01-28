@@ -30,6 +30,9 @@ class CSVReader(AbstractReader):
         """
         raw_data["strike"] = raw_data["strike"].astype(np.float64)
         raw_data["last_price"] = raw_data["last_price"].astype(np.float64)
+        raw_data["bid"] = raw_data["bid"].astype(np.float64)
+        raw_data["ask"] = raw_data["ask"].astype(np.float64)
+        # raw_data["last_price"] = (raw_data["bid"] + raw_data["ask"]) / 2
         return raw_data
 
     def _transform_data(self, cleaned_data: DataFrame):
@@ -39,4 +42,5 @@ class CSVReader(AbstractReader):
         Arguments:
             cleaned_data: the raw ingested data in a DataFrame
         """
+
         return cleaned_data

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Literal
 
 import numpy as np
 from pandas import concat, DataFrame
@@ -40,7 +40,11 @@ def fit_kde(pdf_point_arrays: tuple) -> tuple:
 
 
 def calculate_pdf(
-    options_data: DataFrame, current_price: float, days_forward: int
+    options_data: DataFrame,
+    current_price: float,
+    days_forward: int,
+    risk_free_rate: float,
+    solver_method: str,
 ) -> Tuple[np.ndarray]:
     """The main execution path for the pdf module. Takes a `DataFrame` of
     options data as input and makes a series of function calls to
@@ -51,18 +55,24 @@ def calculate_pdf(
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
+        risk_free_rate: annual risk free rate in nominal terms
 
     Returns:
         a tuple containing the price and density values (in numpy arrays)
         of the calculated PDF
     """
+
     options_data, min_strike, max_strike = _extrapolate_call_prices(
         options_data, current_price
     )
     options_data = _calculate_last_price(options_data)
-    options_data = _calculate_IV(options_data, current_price, days_forward)
+    options_data = _calculate_IV(
+        options_data, current_price, days_forward, risk_free_rate, solver_method
+    )
     denoised_iv = _fit_bspline_IV(options_data)
-    pdf = _create_pdf_point_arrays(denoised_iv, current_price, days_forward)
+    pdf = _create_pdf_point_arrays(
+        denoised_iv, current_price, days_forward, risk_free_rate
+    )
     return _crop_pdf(pdf, min_strike, max_strike)
 
 
@@ -174,31 +184,50 @@ def _calculate_last_price(options_data: DataFrame) -> DataFrame:
 
 
 def _calculate_IV(
-    options_data: DataFrame, current_price: float, days_forward: int
+    options_data: DataFrame,
+    current_price: float,
+    days_forward: int,
+    risk_free_rate: float,
+    solver_method: Literal["newton", "brent"],
 ) -> DataFrame:
-    """Calculate the implied volatility of the options in options_data
+    """
+    Calculate the implied volatility (IV) of the options in options_data.
 
     Args:
-        options_data: a DataFrame containing options price data with
-            cols ['strike', 'last_price']
-        current_price: the current price of the security
-        days_forward: the number of days in the future to estimate the
-            price probability density at
+        options_data (pd.DataFrame): A DataFrame containing option price data with
+            columns ['strike', 'last_price'].
+        current_price (float): The current price of the security.
+        days_forward (int): The number of days in the future to estimate the
+            price probability density at.
+        risk_free_rate (float, optional): Annual risk-free rate in nominal terms. Defaults to 0.
+        solver_method (Literal["newton", "brent"], optional):
+            The method used to solve for IV.
+            - "newton" (default) uses Newton-Raphson iteration.
+            - "brent" uses Brent’s method (more stable).
 
     Returns:
-        the options_data DataFrame, with an additional column for implied volatility
+        DataFrame: The options_data DataFrame with an additional column for implied volatility (IV).
     """
     years_forward = days_forward / 365
+
+    # Choose the IV solver method
+    if solver_method == "newton":
+        iv_solver = _bs_iv_newton_method
+    elif solver_method == "brent":
+        iv_solver = _bs_iv_brent_method
+    else:
+        raise ValueError("Invalid solver_method. Choose either 'newton' or 'brent'.")
+
     options_data["iv"] = options_data.apply(
-        lambda row: _bs_iv(
-            row.last_price,
-            current_price,
-            row.strike,
-            years_forward,
+        lambda row: iv_solver(
+            row.last_price, current_price, row.strike, years_forward, r=risk_free_rate
         ),
         axis=1,
     )
+
+    # Remove rows where IV could not be calculated
     options_data = options_data.dropna()
+
     return options_data
 
 
@@ -239,7 +268,7 @@ def _fit_bspline_IV(options_data: DataFrame) -> DataFrame:
 
 
 def _create_pdf_point_arrays(
-    denoised_iv: tuple, current_price: float, days_forward: int, rf=0.01
+    denoised_iv: tuple, current_price: float, days_forward: int, risk_free_rate: float
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Create two arrays containing x- and y-axis values representing a calculated
     price PDF
@@ -249,7 +278,7 @@ def _create_pdf_point_arrays(
         current_price: the current price of the security
         days_forward: the number of days in the future to estimate the
             price probability density at
-        rf: the current risk free interest rate
+        risk_free_rate: the current annual risk free interest rate, nominal terms
 
     Returns:
         a tuple containing x-axis values (index 0) and y-axis values (index 1)
@@ -262,12 +291,15 @@ def _create_pdf_point_arrays(
     # convert IV-space to price-space
     # re-values call options using the BS formula, taking in as inputs S, domain, IV, and time to expiry
     years_forward = days_forward / 365
-    interpolated = _call_value(current_price, x_IV, y_IV, years_forward)
+    interpolated = _call_value(current_price, x_IV, y_IV, years_forward, risk_free_rate)
     first_derivative_discrete = np.gradient(interpolated, x_IV)
     second_derivative_discrete = np.gradient(first_derivative_discrete, x_IV)
 
     # apply coefficient to reflect the time value of money
-    pdf = np.exp(rf * years_forward) * second_derivative_discrete
+    pdf = np.exp(risk_free_rate * years_forward) * second_derivative_discrete
+
+    # ensure non-negative pdf values (may occur for far OOM options)
+    pdf = np.maximum(pdf, 0)  # Set all negative values to 0
 
     return (x_IV, pdf)
 
@@ -284,32 +316,7 @@ def _crop_pdf(
     return pdf[0][l : r + 1], pdf[1][l : r + 1]
 
 
-# def _bs_iv(
-#     price,
-#     S,
-#     K,
-#     t=0,
-#     r=0,
-#     precision=1e-4,
-#     initial_guess=0.2,
-#     max_iter=1000,
-#     verbose=False,
-# ):
-#     # TODO: refactor this function (style)
-#     iv = initial_guess
-#     for _ in range(max_iter):
-#         P = _call_value(S, K, iv, t, r)
-#         diff = price - P
-#         if abs(diff) < precision:
-#             return iv
-#         grad = _call_vega(S, K, iv, t, r)
-#         iv += diff / grad
-#     if verbose:
-#         print(f"Did not converge after {max_iter} iterations")
-#     return iv
-
-
-def _bs_iv(price, S, K, t, r=0):
+def _bs_iv_brent_method(price, S, K, t, r):
     """
     Computes the implied volatility (IV) of a European call option using Brent’s method.
 
@@ -346,17 +353,87 @@ def _bs_iv(price, S, K, t, r=0):
         return np.nan  # Return NaN if no solution is found
 
 
-def _call_value(S, K, sigma, t=0, r=0):
+def _bs_iv_newton_method(
+    price: float,
+    S: float,
+    K: float,
+    t: float,
+    r: float,
+    precision: float = 1e-4,
+    initial_guess: float = None,
+    max_iter: int = 1000,
+    verbose: bool = False,
+) -> float:
+    """
+    Computes the implied volatility (IV) using Newton-Raphson iteration.
+
+    Args:
+        price (float): Observed market price of the option.
+        S (float): Current price of the underlying asset.
+        K (float): Strike price of the option.
+        t (float): Time to expiration in years.
+        r (float): Risk-free interest rate (annualized).
+        precision (float, optional): Convergence tolerance for Newton's method. Defaults to 1e-4.
+        initial_guess (float, optional): Initial guess for IV. Defaults to 0.2 for ATM options, 0.5 otherwise.
+        max_iter (int, optional): Maximum number of iterations before stopping. Defaults to 1000.
+        verbose (bool, optional): If True, prints debugging information. Defaults to False.
+
+    Returns:
+        float: The implied volatility if found, otherwise np.nan.
+    """
+
+    # Set a dynamic initial guess if none is provided
+    if initial_guess is None:
+        initial_guess = (
+            0.2 if abs(S - K) < 0.1 * S else 0.5
+        )  # Lower guess for ATM, higher for OTM
+
+    iv = initial_guess
+
+    for i in range(max_iter):
+        # Compute Black-Scholes model price and Vega
+        P = _call_value(S, K, iv, t, r)
+        diff = price - P
+
+        # Check for convergence
+        if abs(diff) < precision:
+            return iv
+
+        # Compute Vega (gradient)
+        grad = _call_vega(S, K, iv, t, r)
+
+        # Prevent division by near-zero Vega to avoid large jumps
+        if abs(grad) < 1e-6:
+            if verbose:
+                print(f"Iteration {i}: Vega too small (grad={grad:.6f}), stopping.")
+            return np.nan
+
+        # Newton-Raphson update
+        iv += diff / grad
+
+        # Prevent extreme IV values (e.g., IV > 500%)
+        if iv < 1e-6 or iv > 5.0:
+            if verbose:
+                print(f"Iteration {i}: IV out of bounds (iv={iv:.6f}), stopping.")
+            return np.nan
+
+    if verbose:
+        print(f"Did not converge after {max_iter} iterations")
+
+    return np.nan  # Return NaN if the method fails to converge
+
+
+def _call_vega(S, K, sigma, t, r):
+    # TODO: refactor this function (style)
+    with np.errstate(divide="ignore"):
+        d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
+    return np.multiply(S, norm.pdf(d1)) * np.sqrt(t)
+
+
+def _call_value(S, K, sigma, t, r):
     # TODO: refactor this function (style)
     # use np.multiply and divide to handle divide-by-zero
     with np.errstate(divide="ignore"):
         d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
         d2 = d1 - sigma * np.sqrt(t)
     return np.multiply(norm.cdf(d1), S) - np.multiply(norm.cdf(d2), K * np.exp(-r * t))
-
-
-def _call_vega(S, K, sigma, t=0, r=0):
-    # TODO: refactor this function (style)
-    with np.errstate(divide="ignore"):
-        d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
-    return np.multiply(S, norm.pdf(d1)) * np.sqrt(t)

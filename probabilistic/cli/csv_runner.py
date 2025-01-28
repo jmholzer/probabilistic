@@ -9,9 +9,11 @@ def run(
     input_csv_path: str,
     current_price: float,
     days_forward: int,
-    fit_kernel_pdf: Optional[Bool] = True,
+    risk_free_rate: float,
+    fit_kernel_pdf: Optional[Bool] = False,
     save_to_csv: Bool = False,
     output_csv_path: Optional[str] = None,
+    solver_method: Optional[str] = "brent",
 ) -> pd.DataFrame:
     """
     Runs the probabilistic price distribution estimation using option market data.
@@ -26,11 +28,13 @@ def run(
         current_price (float): The current price of the underlying security.
         days_forward (int): The number of days in the future for which the probability
             density is estimated.
+        risk_free_rate (float): the annual risk free rate in nominal terms
         fit_kernel_pdf (Optional[bool], default=True): Whether to smooth the implied
             PDF using Kernel Density Estimation (KDE).
         save_to_csv (bool, default=False): If `True`, saves the output to a CSV file.
         output_csv_path (Optional[str], default=None): Path to save the output CSV file.
             Required if `save_to_csv=True`.
+        solver_method (str): which solver to use for IV. Either "newton" or "brent"
 
     Returns:
         - If `save_to_csv` is `True`, saves the results to a CSV file and returns `None`.
@@ -40,7 +44,9 @@ def run(
 
     reader = CSVReader()
     options_data = reader.read(input_csv_path)
-    pdf_point_arrays = calculate_pdf(options_data, current_price, days_forward)
+    pdf_point_arrays = calculate_pdf(
+        options_data, current_price, days_forward, risk_free_rate, solver_method
+    )
 
     # Fit KDE to normalize PDF if desired
     if fit_kernel_pdf:
