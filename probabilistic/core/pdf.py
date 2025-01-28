@@ -6,7 +6,37 @@ from scipy.integrate import simps
 from scipy import interpolate
 from scipy.interpolate import interp1d
 from scipy.optimize import brentq
-from scipy.stats import norm
+from scipy.stats import norm, gaussian_kde
+
+
+def fit_kde(pdf_point_arrays: tuple) -> tuple:
+    """
+    Fits a Kernel Density Estimation (KDE) to the given implied probability density function (PDF).
+
+    Args:
+        pdf_point_arrays (tuple): A tuple containing:
+            - A numpy array of price values
+            - A numpy array of PDF values
+
+    Returns:
+        tuple: (prices, fitted_pdf), where:
+            - prices: The original price array
+            - fitted_pdf: The KDE-fitted probability density values
+    """
+
+    # Unpack tuple
+    prices, pdf_values = pdf_point_arrays
+
+    # Normalize PDF to ensure it integrates to 1
+    pdf_values /= np.trapz(pdf_values, prices)  # Use trapezoidal rule for normalization
+
+    # Fit KDE using price points weighted by the normalized PDF
+    kde = gaussian_kde(prices, weights=pdf_values)
+
+    # Generate KDE-fitted PDF values
+    fitted_pdf = kde.pdf(prices)
+
+    return (prices, fitted_pdf)
 
 
 def calculate_pdf(
@@ -161,7 +191,7 @@ def _calculate_IV(
     years_forward = days_forward / 365
     options_data["iv"] = options_data.apply(
         lambda row: _bs_iv(
-            row.last_price, current_price, row.strike, years_forward, max_iter=500
+            row.last_price, current_price, row.strike, years_forward, max_iter=1000
         ),
         axis=1,
     )
@@ -251,22 +281,6 @@ def _crop_pdf(
     return pdf[0][l : r + 1], pdf[1][l : r + 1]
 
 
-def _call_value(S, K, sigma, t=0, r=0):
-    # TODO: refactor this function (style)
-    # use np.multiply and divide to handle divide-by-zero
-    with np.errstate(divide="ignore"):
-        d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
-        d2 = d1 - sigma * np.sqrt(t)
-    return np.multiply(norm.cdf(d1), S) - np.multiply(norm.cdf(d2), K * np.exp(-r * t))
-
-
-def _call_vega(S, K, sigma, t=0, r=0):
-    # TODO: refactor this function (style)
-    with np.errstate(divide="ignore"):
-        d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
-    return np.multiply(S, norm.pdf(d1)) * np.sqrt(t)
-
-
 def _bs_iv(
     price,
     S,
@@ -290,3 +304,19 @@ def _bs_iv(
     if verbose:
         print(f"Did not converge after {max_iter} iterations")
     return iv
+
+
+def _call_value(S, K, sigma, t=0, r=0):
+    # TODO: refactor this function (style)
+    # use np.multiply and divide to handle divide-by-zero
+    with np.errstate(divide="ignore"):
+        d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
+        d2 = d1 - sigma * np.sqrt(t)
+    return np.multiply(norm.cdf(d1), S) - np.multiply(norm.cdf(d2), K * np.exp(-r * t))
+
+
+def _call_vega(S, K, sigma, t=0, r=0):
+    # TODO: refactor this function (style)
+    with np.errstate(divide="ignore"):
+        d1 = np.divide(1, sigma * np.sqrt(t)) * (np.log(S / K) + (r + sigma**2 / 2) * t)
+    return np.multiply(S, norm.pdf(d1)) * np.sqrt(t)
