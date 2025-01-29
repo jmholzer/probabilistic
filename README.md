@@ -69,17 +69,6 @@ df = cli.csv_runner.run(
 ![Probabilistic example output](.meta/images/nvidia_output.png)
 
 
-<b>Option 2: To start the web-based dashboard, run the following command:</b>
-
-```bash
-probabilistic
-```
-
-This will start a local web server and you should be able to access the dashboard in your web browser at `localhost:8501`.
-
-The user will need to provide their own options data in a CSV file with the columns 'strike', and 'last_price'. Sample data for SPY can be found in the `data` folder.
-
-
 ## Theory Overview
 
 An option is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an asset at a specified price (strike price) on a certain date in the future. Intuitively, the value of an option depends on the probability that it will be profitable or "in-the-money" at expiration. If the probability of ending "in-the-money" (ITM) is high, the option is more valuable. If the probability is low, the option is worth less.
