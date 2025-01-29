@@ -23,12 +23,14 @@ Please note that this project requires Python 3.10 or later.
 <b>Option 1: To use probabilistic, see `example_script.py` for a demo:</b>
 
 The user will need to specify 4 mandatory arguments:
+
 1. `input_csv_path`: a string containing the file path of the options data in a csv, with the columns 'strike', 'last_price', 'bid, 'ask'
 2. `current_price`: a number of the underlying asset's current price
 3. `days_foward`: a number of the days between the current date and the strike date
 4. `risk_free_rate`: a number indicating the annual risk-free rate in nominal terms
 
 There are 4 additional optional arguments:
+
 5. `fit_kernel_pdf`: (optional) a True or False boolean, indicating whether to fit a kernel-density estimator on the resulting raw probability distribution. Fitting a KDE may improve edge-behavior of the PDF. Default is False
 6. `save_to_csv`: (optional) a True or False boolean, where if True, the output will be saved to csv. Default is False
 7. `output_csv_path`: (optional) a string containing the file path where the user wishes to save the results
