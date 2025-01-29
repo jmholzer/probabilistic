@@ -16,14 +16,16 @@ This Python project generates probability density function (PDFs) and cumulative
 
 ## Installation
 
-```pip install oipd```
+```zsh
+pip install oipd
+```
 
 Please note that this project requires Python 3.10 or later.
 
 
 ## Quick Start Guide
 
-<b>Option 1: To use probabilistic, see `example_script.py` for a demo:</b>
+<b>Option 1: To use probabilistic, see `example.ipynb` for a demo:</b>
 
 The user will need to specify 4 mandatory arguments:
 
@@ -41,7 +43,7 @@ There are 4 additional optional arguments:
 
 3 examples of options data is provided in the `data/` folder. 
 
-```
+```python
 from probabilistic import cli
 
 input_csv_path = "path_to_your_options_data"
