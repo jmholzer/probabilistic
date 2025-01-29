@@ -46,9 +46,16 @@ There are 4 additional optional arguments:
 ```python
 from probabilistic import cli
 
-input_csv_path = "path_to_your_options_data"
-current_price = 184.8
-days_forward = 123
+# Example - NVIDIA
+input_csv_path = "path_to_your_options_data_csv"
+current_price = 121.44
+current_date = "2025-01-28"
+strike_date = "2025-05-16"
+# Convert the strings to datetime objects
+current_date_dt = datetime.strptime(current_date, "%Y-%m-%d")
+strike_date_dt = datetime.strptime(strike_date, "%Y-%m-%d")
+# Calculate the difference in days
+days_difference = (strike_date_dt - current_date_dt).days
 
 df = cli.csv_runner.run(
     input_csv_path=input_csv_path,
