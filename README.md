@@ -5,18 +5,21 @@
 
 This Python project generates probability density function (PDFs) and cumulative distribution functions (CDFs) for the future prices of stocks, as implied by options prices. The output is visualized with matplotlib, and the project also includes a user-friendly web-based dashboard interface built with Streamlit.
 
+
 ## Table of Contents
 
 - [Installation](#installation)
-- [Usage](#usage)
+- [Quick Start Guide](#Quick-Start-Guide)
 - [Algorithm Overview](#algorithm-overview)
 - [License](#license)
+
 
 ## Installation
 
 ```pip install probabilistic```
 
 Please note that this project requires Python 3.10 or later.
+
 
 ## Quick Start Guide
 
@@ -81,6 +84,7 @@ This illustrates how option prices contain information about the probabilities a
 For a simplified worked example, see this [excellent blog post](https://reasonabledeviations.com/2020/10/01/option-implied-pdfs/).
 For a complete reading of the financial theory, see [this paper](https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870).
 
+
 ## Algorithm Overview
 
 The process of generating the PDFs and CDFs is as follows:
@@ -90,8 +94,9 @@ The process of generating the PDFs and CDFs is as follows:
 3. Using B-spline, we fit a curve-of-best-fit onto the resulting IVs over the full range of strike prices[^3]. Thus, we have extracted a continuous model from discrete IV observations - this is called the volatility smile
 4. From the volatility smile, we use Black-Scholes to convert IVs back to prices. Thus, we arrive at a continuous curve of options prices along the full range of strike prices
 5. From the continuous price curve, we use numerical differentiation to get the first derivative of prices. Then we numerically differentiate again to get the second derivative of prices. The second derivative of prices multiplied by a discount factor $\exp^{r*\uptau}$, results in the probability density function [^4]
-6. We can fit a KDE onto the resulting PDF, which in some cases will improve edge-behavior at very high or very low prices
+6. We can fit a KDE onto the resulting PDF, which in some cases will improve edge-behavior at very high or very low prices. This is specified by the argument `fit_kernal_pdf`
 7. Once we have the PDF, we can calculate the CDF
+
 
 [^1]: We chose to use last price instead of calculating the mid-price given the bid-ask spread. This is because Yahoo Finance, a common source for options chain data, often lacks bid-ask data. See for example [Apple options](https://finance.yahoo.com/quote/AAPL/options/)
 [^2]: We convert from price-space to IV-space, and then back to price-space as described in step 4. See this [blog post](https://reasonabledeviations.com/2020/10/10/option-implied-pdfs-2/) for a breakdown of why we do this double conversion
