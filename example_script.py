@@ -20,7 +20,6 @@ df = cli.csv_runner.run(
     days_forward=int(days_difference),
     risk_free_rate=0.03,
     fit_kernel_pdf=True,
-    solver_method="brent",
 )
 
 # Plot probability density function

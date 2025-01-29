@@ -11,7 +11,7 @@ def run(
     days_forward: int,
     risk_free_rate: float,
     fit_kernel_pdf: Optional[Bool] = False,
-    save_to_csv: Bool = False,
+    save_to_csv: Optional[Bool] = False,
     output_csv_path: Optional[str] = None,
     solver_method: Optional[str] = "brent",
 ) -> pd.DataFrame:
