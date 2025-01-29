@@ -16,7 +16,7 @@ This Python project generates probability density function (PDFs) and cumulative
 
 ## Installation
 
-```pip install probabilistic```
+```pip install oipd```
 
 Please note that this project requires Python 3.10 or later.
 
