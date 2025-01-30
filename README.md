@@ -1,4 +1,4 @@
-![Probabilistic logo](probabilistic/dashboard/resources/oipd-high-resolution-logo.png)
+![Probabilistic logo](probabilistic/dashboard/resources/oipd-logo.png)
 
 ![Python version](https://img.shields.io/badge/python-3.10-blue.svg)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
