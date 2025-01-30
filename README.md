@@ -96,7 +96,7 @@ As an example, imagine Apple stock (AAPL) is currently $150, and you buy a call 
 - If Apple is likely to rise to $170, the option has a high probability of being ITM → more valuable
 - If Apple is unlikely to go above $160, the option has little chance of being ITM → less valuable
 
-This illustrates how option prices contain information about the probabilities about the future price of the underlying stock (as determined by market expectations). By knowing the prices of options, we can reverse-engineer and extract this information about the probabilities. 
+This illustrates how option prices contain information about the probabilities of the future price of the stock (as determined by market expectations). By knowing the prices of options, we can reverse-engineer and extract information contained about probabilities. 
 
 For a simplified worked example, see this [excellent blog post](https://reasonabledeviations.com/2020/10/01/option-implied-pdfs/).
 For a complete reading of the financial theory, see [this paper](https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2000/recent-developments-in-extracting-information-from-options-markets.pdf?la=en&hash=8D29F2572E08B9F2B541C04102DE181C791DB870).
