@@ -5,8 +5,9 @@
 
 This Python project generates probability density function (PDFs) and cumulative distribution functions (CDFs) for the future prices of stocks, as implied by (call) options prices.
 
-![OIPD example output](.meta/images/spy_output.png)
-
+<p align="center">
+    ![OIPD example output](.meta/images/spy_output.png | width=50)
+</p>
 
 
 ## Table of Contents
@@ -73,8 +74,9 @@ spy_pdf = cli.generate_pdf.run(
 
 
 <b>Another interesting example is US Steel:</b>
-
-![OIPD example output](.meta/images/ussteel_output.png)
+<p align="center">
+    ![OIPD example output](.meta/images/ussteel_output.png | width = 50)
+</p>
 
 The market seems to believe that US Steel share price will rise significantly by December 2025, likely indicating concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed by federal regulators.
 
