@@ -83,7 +83,7 @@ spy_pdf = cli.generate_pdf.run(
     <img src=".meta/images/ussteel_output.png" width="60%">
 </p>
 
-The market seems to believe that US Steel share price will rise significantly by December 2025, likely indicating concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed by federal regulators.
+The market appears to expect a significant rise in U.S. Steel’s share price by December 2025, likely reflecting a consensus that federal regulators will approve Nippon Steel’s proposed $55 per share acquisition.
 
 <i>Note that the domain (x-axis) is limited in this graph, due to (1) not many strike prices exist for US Steel, and (2) some extreme ITM/OTM options did not have solvable IVs.</i>
 
