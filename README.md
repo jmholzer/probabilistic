@@ -70,14 +70,14 @@ spy_pdf = cli.generate_pdf.run(
 
 ![OIPD example output](.meta/images/spy_output.png)
 
-The market consensus seems to indicate bullish sentiment towards SPY, with a slim but non-zero left-tail risk.
+The market consensus seems to be bullish on the S&P500 for the next month, with fat left-tail risk.
 
 
 <b>Another interesting example is US Steel:</b>
 
 ![OIPD example output](.meta/images/ussteel_output.png)
 
-The market seems to believe that US Steel share price will rise significantly by December 2025, likely indicating concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed. 
+The market seems to believe that US Steel share price will rise significantly by December 2025, likely indicating concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed by federal regulators.
 
 <i>Note that the domain (x-axis) is limited in this graph, due to (1) not many strike prices exist for US Steel, and (2) some extreme ITM/OTM options did not have solvable IVs.</i>
 
