@@ -86,11 +86,11 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/jmholzer/probabilistic-pdfs"
-"Bug Tracker" = "https://github.com/jmholzer/probabilistic-pdfs/issues"
+"Homepage" = "https://github.com/tyrneh/options-implied-probability"
+"Bug Tracker" = "https://github.com/tyrneh/options-implied-probability/issues"
 
 [project.scripts]
-probabilistic = "probabilistic.cli:main"
+oipd = "oipd.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

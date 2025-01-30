@@ -1,4 +1,4 @@
-![Probabilistic logo](probabilistic/dashboard/resources/oipd-logo.png)
+![OIPD logo](oipd/dashboard/resources/oipd-logo.png)
 
 ![Python version](https://img.shields.io/badge/python-3.10-blue.svg)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
@@ -46,7 +46,7 @@ The file [`example.ipynb`](example.ipynb) is supplied as a demo.
 Note that oipd only uses call options data for now. 
 
 ```python
-from probabilistic import cli
+from oipd import cli
 
 # Example - SPY
 input_csv_path = "path_to_your_options_data_csv"
@@ -68,13 +68,14 @@ spy_pdf = cli.generate_pdf.run(
 )
 ```
 
-![Probabilistic example output](.meta/images/spy_output.png)
+![OIPD example output](.meta/images/spy_output.png)
 
 The market consensus seems to indicate bullish sentiment towards SPY, with a slim but non-zero left-tail risk.
 
 
 <b>Another interesting example is US Steel:</b>
-![Probabilistic example output](.meta/images/ussteel_output.png)
+
+![OIPD example output](.meta/images/ussteel_output.png)
 
 The market seems to believe that US Steel share price will rise significantly by December 2025, likely indicating concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed. 
 
