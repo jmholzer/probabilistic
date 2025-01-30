@@ -3,7 +3,7 @@
 ![Python version](https://img.shields.io/badge/python-3.10-blue.svg)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
 
-This Python project generates probability density function (PDFs) and cumulative distribution functions (CDFs) for the future prices of stocks, as implied by options prices. The output is visualized with matplotlib, and the project also includes a user-friendly web-based dashboard interface built with Streamlit.
+This Python project generates probability density function (PDFs) and cumulative distribution functions (CDFs) for the future prices of stocks, as implied by (call) options prices.
 
 
 ## Table of Contents
@@ -25,39 +25,40 @@ Please note that this project requires Python 3.10 or later.
 
 ## Quick Start Guide
 
-<b>Option 1: To use probabilistic, see `example.ipynb` for a demo:</b>
+The file `example.ipynb` is supplied as a demo.
 
-The user will need to specify 4 mandatory arguments:
+<b>The user will need to specify 4 mandatory arguments:</b>
 
 1. `input_csv_path`: a string containing the file path of the options data in a csv, with the columns 'strike', 'last_price', 'bid, 'ask'
 2. `current_price`: a number of the underlying asset's current price
 3. `days_foward`: a number of the days between the current date and the strike date
 4. `risk_free_rate`: a number indicating the annual risk-free rate in nominal terms
 
-There are 4 additional optional arguments:
+<b>There are 4 additional optional arguments:</b>
 
 5. `fit_kernel_pdf`: (optional) a True or False boolean, indicating whether to fit a kernel-density estimator on the resulting raw probability distribution. Fitting a KDE may improve edge-behavior of the PDF. Default is False
 6. `save_to_csv`: (optional) a True or False boolean, where if True, the output will be saved to csv. Default is False
 7. `output_csv_path`: (optional) a string containing the file path where the user wishes to save the results
 8. `solver_method`: (optional) a string of either 'newton' or 'brent', indicating which solver to use. Default is 'brent'
 
-3 examples of options data is provided in the `data/` folder. 
+<b>3 examples of options data is provided in the `data/` folder, downloaded from Yahoo Finance.</b>
+Note that oipd only uses call options for now. Incorporating information from puts can be a future feature worth considering.
 
 ```python
 from probabilistic import cli
 
-# Example - NVIDIA
+# Example - SPY
 input_csv_path = "path_to_your_options_data_csv"
-current_price = 121.44
+current_price = 604.44
 current_date = "2025-01-28"
-strike_date = "2025-05-16"
+strike_date = "2025-02-28"
 # Convert the strings to datetime objects
 current_date_dt = datetime.strptime(current_date, "%Y-%m-%d")
 strike_date_dt = datetime.strptime(strike_date, "%Y-%m-%d")
 # Calculate the difference in days
 days_difference = (strike_date_dt - current_date_dt).days
 
-df = cli.generate_pdf.run(
+spy_pdf = cli.generate_pdf.run(
     input_csv_path=input_csv_path,
     current_price=float(current_price),
     days_forward=int(days_difference),
@@ -66,7 +67,13 @@ df = cli.generate_pdf.run(
 )
 ```
 
-![Probabilistic example output](.meta/images/nvidia_output.png)
+![Probabilistic example output](.meta/images/spy_output.png)
+The market consensus seems to indicate bullish sentiment towards SPY, with a slim but non-zero left-tail risk.
+
+Another interesting example is US Steel:
+![Probabilistic example output](.meta/images/ussteel_output.png)
+The market seems to believe that its share price will rise significantly by December 2025, likely indicating some concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed. 
+<i>Note that the domain (x-axis) is limited in this graph, due to (1) not many strike prices exist for US Steel, and (2) some extreme ITM/OTM options did not have solvable IVs.</i>
 
 
 ## Theory Overview
