@@ -1,4 +1,4 @@
-from probabilistic import cli
+from oipd import cli
 from datetime import datetime
 import matplotlib.pyplot as plt
 
@@ -14,7 +14,7 @@ strike_date_dt = datetime.strptime(strike_date, "%Y-%m-%d")
 days_difference = (strike_date_dt - current_date_dt).days
 # output_csv_path = "/Users/henrytian/Downloads/results.csv"
 
-df = cli.csv_runner.run(
+df = cli.generate_pdf.run(
     input_csv_path=input_csv_path,
     current_price=float(current_price),
     days_forward=int(days_difference),
@@ -25,10 +25,17 @@ df = cli.csv_runner.run(
 # Plot probability density function
 plt.figure(figsize=(8, 5))
 plt.plot(df.Price, df.PDF, label="Implied PDF", color="cyan", alpha=0.7)
+# Add a vertical line at x = 121.44
+plt.axvline(x=121.44, color="white", linestyle="--")
+# Add annotation for clarity
+plt.text(121.44, max(df.PDF) * 0.3, "Current price on\n Jan 28 2025: 121.44", 
+         color="white", fontsize=12, ha="left", va="top")
+# Labels and title
 plt.xlabel("Price")
 plt.ylabel("Density")
-plt.legend()
-plt.title("Implied PDF of NVIDIA at 2025-05-16, from perspective of 2025-01-28")
+# plt.legend()
+plt.title("Implied probability dist of NVIDIA on May 16 2025")
+# Show the plot
 plt.show()
 
 # Example 2 - SPY
@@ -43,7 +50,7 @@ strike_date_dt = datetime.strptime(strike_date, "%Y-%m-%d")
 days_difference = (strike_date_dt - current_date_dt).days
 # output_csv_path = "/Users/henrytian/Downloads/results.csv"
 
-df = cli.csv_runner.run(
+df = cli.generate_pdf.run(
     input_csv_path=input_csv_path,
     current_price=float(current_price),
     days_forward=int(days_difference),
@@ -75,7 +82,7 @@ days_difference = (strike_date_dt - current_date_dt).days
 # output_csv_path = "/Users/henrytian/Downloads/results.csv"
 
 
-ussteel_pdf = cli.csv_runner.run(
+ussteel_pdf = cli.generate_pdf.run(
     input_csv_path=input_csv_path,
     current_price=float(current_price),
     days_forward=int(days_difference),

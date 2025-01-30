@@ -1,10 +1,10 @@
 from click.testing import CliRunner
 
-from probabilistic.cli import cli, csv_runner
+from oipd.cli import cli, generate_pdf
 
 
 def test_calculate_csv(mocker):
     runner = CliRunner()
-    mocker.patch("probabilistic.cli.csv_runner.run")
+    mocker.patch("oipd.cli.generate_pdf.run")
     runner.invoke(cli.calculate, ["--csv", "dummy_path"])
-    csv_runner.run.assert_called_once_with("dummy_path")
+    generate_pdf.run.assert_called_once_with("dummy_path")

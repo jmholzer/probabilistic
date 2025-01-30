@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import MultipleLocator
 from numpy import linspace, ndarray
 
-from probabilistic.core import calculate_quartiles
+from oipd.core import calculate_quartiles
 
 pyplot.rcParams["axes.autolimit_mode"] = "round_numbers"
 

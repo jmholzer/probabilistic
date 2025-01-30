@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-from probabilistic.io.reader import AbstractReader
+from oipd.io.reader import AbstractReader
 
 
 class CSVReader(AbstractReader):

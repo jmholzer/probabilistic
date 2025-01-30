@@ -1,7 +1,7 @@
 from pathlib import Path
 import numpy as np
 import pytest
-from probabilistic.io import CSVReader
+from oipd.io import CSVReader
 
 
 @pytest.fixture

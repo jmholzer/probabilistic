@@ -57,7 +57,7 @@ strike_date_dt = datetime.strptime(strike_date, "%Y-%m-%d")
 # Calculate the difference in days
 days_difference = (strike_date_dt - current_date_dt).days
 
-df = cli.csv_runner.run(
+df = cli.generate_pdf.run(
     input_csv_path=input_csv_path,
     current_price=float(current_price),
     days_forward=int(days_difference),

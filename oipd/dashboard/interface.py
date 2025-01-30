@@ -3,9 +3,9 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from probabilistic.core import calculate_cdf, calculate_pdf
-from probabilistic.graphics import generate_cdf_figure, generate_pdf_figure
-from probabilistic.io import CSVReader
+from oipd.core import calculate_cdf, calculate_pdf
+from oipd.graphics import generate_cdf_figure, generate_pdf_figure
+from oipd.io import CSVReader
 
 
 def generate_interface() -> None:

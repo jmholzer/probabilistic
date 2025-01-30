@@ -1,5 +1,5 @@
-from probabilistic.core import calculate_pdf, calculate_cdf, fit_kde
-from probabilistic.io import CSVReader
+from oipd.core import calculate_pdf, calculate_cdf, fit_kde
+from oipd.io import CSVReader
 import pandas as pd
 from traitlets import Bool
 from typing import Optional
@@ -16,7 +16,7 @@ def run(
     solver_method: Optional[str] = "brent",
 ) -> pd.DataFrame:
     """
-    Runs the probabilistic price distribution estimation using option market data.
+    Runs the OIPD price distribution estimation using option market data.
 
     This function reads option data from a CSV file, calculates an implied probability
     density function (PDF) based on market prices, and optionally smooths the PDF

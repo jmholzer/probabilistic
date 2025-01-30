@@ -5,6 +5,6 @@ if __name__ == "__main__":
         packages=setuptools.find_packages(),
         include_package_data=True,
         package_data={
-            'probabilistic.dashboard.resources': ['*.png'],
+            "oipd.dashboard.resources": ["*.png"],
         },
     )
