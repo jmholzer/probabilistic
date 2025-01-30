@@ -5,6 +5,9 @@
 
 This Python project generates probability density function (PDFs) and cumulative distribution functions (CDFs) for the future prices of stocks, as implied by (call) options prices.
 
+![OIPD example output](.meta/images/spy_output.png)
+
+
 
 ## Table of Contents
 
@@ -67,10 +70,6 @@ spy_pdf = cli.generate_pdf.run(
     fit_kernel_pdf=True,
 )
 ```
-
-![OIPD example output](.meta/images/spy_output.png)
-
-The market consensus seems to be bullish on the S&P500 for the next month, with fat left-tail risk.
 
 
 <b>Another interesting example is US Steel:</b>
