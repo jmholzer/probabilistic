@@ -25,7 +25,7 @@ Please note that this project requires Python 3.10 or later.
 
 ## Quick Start Guide
 
-The file `example.ipynb` is supplied as a demo.
+The file [`example.ipynb`](example.ipynb) is supplied as a demo.
 
 <b>The user will need to specify 4 mandatory arguments:</b>
 
@@ -42,7 +42,8 @@ The file `example.ipynb` is supplied as a demo.
 8. `solver_method`: (optional) a string of either 'newton' or 'brent', indicating which solver to use. Default is 'brent'
 
 <b>3 examples of options data is provided in the `data/` folder, downloaded from Yahoo Finance.</b>
-Note that oipd only uses call options for now. Incorporating information from puts can be a future feature worth considering.
+
+Note that oipd only uses call options data for now. 
 
 ```python
 from probabilistic import cli
@@ -68,11 +69,15 @@ spy_pdf = cli.generate_pdf.run(
 ```
 
 ![Probabilistic example output](.meta/images/spy_output.png)
+
 The market consensus seems to indicate bullish sentiment towards SPY, with a slim but non-zero left-tail risk.
 
-Another interesting example is US Steel:
+
+<b>Another interesting example is US Steel:</b>
 ![Probabilistic example output](.meta/images/ussteel_output.png)
-The market seems to believe that its share price will rise significantly by December 2025, likely indicating some concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed. 
+
+The market seems to believe that US Steel share price will rise significantly by December 2025, likely indicating concensus that Nippon Steel's proposed acquisition at $55 per share will be allowed to proceed. 
+
 <i>Note that the domain (x-axis) is limited in this graph, due to (1) not many strike prices exist for US Steel, and (2) some extreme ITM/OTM options did not have solvable IVs.</i>
 
 
