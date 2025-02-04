@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oipd"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Jannic Holzer", email="jannic.holzer@gmail.com" },
   { name="Henry Tian", email="tyrneh@gmail.com" },
