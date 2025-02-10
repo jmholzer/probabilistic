@@ -6,6 +6,7 @@ __pycache__/
 # data files 
 *.xlsx
 *.csv
+example_script.py
 
 # C extensions
 *.so
